@@ -1,6 +1,7 @@
 # aws-transit-vpc
 Source code for the AWS solution "Transit Network VPC (Cisco CSR). Please see the main solution for the [AWS Transit VPC](https://aws.amazon.com/answers/transit-vpc/). 
 
+This is a customization for EDC that allows for the use of VRFs based on transitvpc tag value
 
 ## Cloudformation templates
 
