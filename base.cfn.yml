@@ -1,0 +1,158 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Base Account Stack
+Metadata:
+  'AWS::CloudFormation::Interface':
+    ParameterGroups:
+      - Label:
+          default: 'Please provide the following parameter values:'
+        Parameters:
+          - ProfileLevel
+          - NotifyEmail
+      - Label:
+          default: Template Bucket Configuration
+        Parameters:
+          - TemplateBucketName
+          - TemplateBucketPrefix
+    ParameterLabels:
+      NotifyEmail:
+        default: Notification Email Address
+      ProfileLevel:
+        default: Profile Level
+      TemplateBucketName:
+        default: Template S3 Bucket Name
+      TemplateBucketPrefix:
+        default: Template S3 Key Prefix
+  Stack:
+    Value: 0
+  VersionDate:
+    Value: 20160518
+  Identifier:
+    Value: main
+  Input:
+    Description: Input of all required parameters in nested stacks
+  Output:
+    Description: N/A
+Parameters:
+  ProfileLevel:
+    Description: The strictness of controls to be applied to the environment
+    Type: String
+    Default: Production
+    AllowedValues:
+      - Development
+      - Production
+    ConstraintDescription: Development or Production
+  TemplateBucketName:
+    AllowedPattern: '^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$'
+    ConstraintDescription: >-
+      Quick Start bucket name can include numbers, lowercase letters, uppercase
+      letters, and hyphens (-). It cannot start or end with a hyphen (-).
+    Default: edc-cfn-templates
+    Description: >-
+      S3 bucket name for the Quick Start assets. Quick Start bucket name can
+      include numbers, lowercase letters, uppercase letters, and hyphens (-). It
+      cannot start or end with a hyphen (-).
+    Type: String
+  TemplateBucketPrefix:
+    AllowedPattern: '^[0-9a-zA-Z-]+(/[0-9a-zA-Z-]+)*$'
+    ConstraintDescription: >-
+      Quick Start key prefix can include numbers, lowercase letters, uppercase
+      letters, hyphens (-), and forward slash (/). It cannot start or end with
+      forward slash (/) because they are automatically appended.
+    Default: base/latest
+    Description: >-
+      S3 key prefix for the Quick Start assets. Quick Start key prefix can
+      include numbers, lowercase letters, uppercase letters, hyphens (-), and
+      forward slash (/). It cannot start or end with forward slash (/) because
+      they are automatically appended.
+    Type: String
+  NotifyEmail:
+    Description: >-
+      Notification email address for security events (you will receive a
+      confirmation email)
+    Type: String
+    Default: daryl.robbins@entrustdatacard.com
+Mappings:
+  AWSInfoRegionMap:
+    ap-northeast-1:
+      Partition: aws
+      QuickStartS3URL: 'https://s3.amazonaws.com'
+    ap-northeast-2:
+      Partition: aws
+      QuickStartS3URL: 'https://s3.amazonaws.com'
+    ap-south-1:
+      Partition: aws
+      QuickStartS3URL: 'https://s3.amazonaws.com'
+    ap-southeast-1:
+      Partition: aws
+      QuickStartS3URL: 'https://s3.amazonaws.com'
+    ap-southeast-2:
+      Partition: aws
+      QuickStartS3URL: 'https://s3.amazonaws.com'
+    ca-central-1:
+      Partition: aws
+      QuickStartS3URL: 'https://s3.amazonaws.com'
+    eu-central-1:
+      Partition: aws
+      QuickStartS3URL: 'https://s3.amazonaws.com'
+    eu-west-1:
+      Partition: aws
+      QuickStartS3URL: 'https://s3.amazonaws.com'
+    eu-west-2:
+      Partition: aws
+      QuickStartS3URL: 'https://s3.amazonaws.com'
+    sa-east-1:
+      Partition: aws
+      QuickStartS3URL: 'https://s3.amazonaws.com'
+    us-east-1:
+      Partition: aws
+      QuickStartS3URL: 'https://s3.amazonaws.com'
+    us-east-2:
+      Partition: aws
+      QuickStartS3URL: 'https://s3.amazonaws.com'
+    us-gov-west-1:
+      Partition: aws-us-gov
+      QuickStartS3URL: 'https://s3-us-gov-west-1.amazonaws.com'
+    us-west-1:
+      Partition: aws
+      QuickStartS3URL: 'https://s3.amazonaws.com'
+    us-west-2:
+      Partition: aws
+      QuickStartS3URL: 'https://s3.amazonaws.com'
+  CustomVariables:
+    vResourceEnvironmentTagKey:
+      Value: Environment
+    vResourceEnvironmentTagValue:
+      Value: development
+Resources:
+  LoggingStack:
+    Type: 'AWS::CloudFormation::Stack'
+    Properties:
+      TemplateURL: !Sub
+        - >-
+          ${TemplateS3URL}/${TemplateBucketName}/${TemplateBucketPrefix}/templates/logging.cfn.yml
+        - TemplateS3URL: !FindInMap
+            - AWSInfoRegionMap
+            - !Ref 'AWS::Region'
+            - QuickStartS3URL
+      Parameters:
+        pNotifyEmail: !Ref NotifyEmail
+  IamStack:
+    Type: 'AWS::CloudFormation::Stack'
+    Properties:
+      TemplateURL: !Sub
+        - >-
+          ${TemplateS3URL}/${TemplateBucketName}/${TemplateBucketPrefix}/templates/iam.cfn.yml
+        - TemplateS3URL: !FindInMap
+            - AWSInfoRegionMap
+            - !Ref 'AWS::Region'
+            - QuickStartS3URL
+Outputs:
+  TemplateType:
+    Value: Base Account Stack
+  TemplateVersion:
+    Value: 1
+  Help:
+    Description: >-
+      For assistance or questions regarding this quickstart please email
+      compliance-accelerator@amazon.com
+    Value: ''
