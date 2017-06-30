@@ -102,7 +102,7 @@ Metadata:
           default: Cisco CSR Configuration
         Parameters:
           - CSRType
-          - KeyName
+         # - KeyName
           - LicenseModel
           - TerminationProtection
       - Label:
@@ -1244,6 +1244,15 @@ Resources:
           - ''''
           - '}'
           - '}'
+  KeyPairSecretResource:
+    Type: Custom::CredstashCredentialResource
+    Properties:
+      ServiceToken: {"Fn::ImportValue": !Sub "${ParentStackName}-credstash-resource"}
+      TableCredstash: {"Fn::ImportValue": !Sub "${ParentStackName}-credstash"}
+      KeyAlias: {"Fn::ImportValue": !Sub "${ParentStackName}-credstash-key"}
+      SecretName: keypair
+      SecretType: ssh-key
+      SecretVersion: 1
 Outputs:
   CSR1:
     Description: IP Address for CSR1
