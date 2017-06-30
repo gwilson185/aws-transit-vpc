@@ -129,7 +129,7 @@ Resources:
     Properties:
       TemplateURL: !Sub
         - >-
-          ${TemplateS3URL}/${TemplateBucketName}/${TemplateBucketPrefix}/templates/logging.cfn.yml
+          ${TemplateS3URL}/${TemplateBucketName}/${TemplateBucketPrefix}/templates/base-LoggingStack.cfn.yml
         - TemplateS3URL: !FindInMap
             - AWSInfoRegionMap
             - !Ref 'AWS::Region'
@@ -141,7 +141,27 @@ Resources:
     Properties:
       TemplateURL: !Sub
         - >-
-          ${TemplateS3URL}/${TemplateBucketName}/${TemplateBucketPrefix}/templates/iam.cfn.yml
+          ${TemplateS3URL}/${TemplateBucketName}/${TemplateBucketPrefix}/templates/base-IAMStack.cfn.yml
+        - TemplateS3URL: !FindInMap
+            - AWSInfoRegionMap
+            - !Ref 'AWS::Region'
+            - QuickStartS3URL
+  CredstashStack:
+    Type: 'AWS::CloudFormation::Stack'
+    Properties:
+      TemplateURL: !Sub
+        - >-
+          ${TemplateS3URL}/${TemplateBucketName}/${TemplateBucketPrefix}/templates/credstash.cfn.yml
+        - TemplateS3URL: !FindInMap
+            - AWSInfoRegionMap
+            - !Ref 'AWS::Region'
+            - QuickStartS3URL
+  Transit-VPCStack:
+    Type: 'AWS::CloudFormation::Stack'
+    Properties:
+      TemplateURL: !Sub
+        - >-
+          ${TemplateS3URL}/${TemplateBucketName}/${TemplateBucketPrefix}/templates/transit-vpc.cfn.yml
         - TemplateS3URL: !FindInMap
             - AWSInfoRegionMap
             - !Ref 'AWS::Region'
