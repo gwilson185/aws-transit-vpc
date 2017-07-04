@@ -129,7 +129,7 @@ Resources:
     Properties:
       TemplateURL: !Sub
         - >-
-          ${TemplateS3URL}/${TemplateBucketName}/${TemplateBucketPrefix}/templates/base-LoggingStack.cfn.yml
+          ${TemplateS3URL}/${TemplateBucketName}/templates/base-LoggingStack.cfn.yml
         - TemplateS3URL: !FindInMap
             - AWSInfoRegionMap
             - !Ref 'AWS::Region'
@@ -141,7 +141,7 @@ Resources:
     Properties:
       TemplateURL: !Sub
         - >-
-          ${TemplateS3URL}/${TemplateBucketName}/${TemplateBucketPrefix}/templates/base-IAMStack.cfn.yml
+          ${TemplateS3URL}/${TemplateBucketName}/templates/base-IAMStack.cfn.yml
         - TemplateS3URL: !FindInMap
             - AWSInfoRegionMap
             - !Ref 'AWS::Region'
@@ -151,7 +151,7 @@ Resources:
     Properties:
       TemplateURL: !Sub
         - >-
-          ${TemplateS3URL}/${TemplateBucketName}/${TemplateBucketPrefix}/templates/credstash.cfn.yml
+          ${TemplateS3URL}/${TemplateBucketName}/templates/credstash.cfn.yml
         - TemplateS3URL: !FindInMap
             - AWSInfoRegionMap
             - !Ref 'AWS::Region'
@@ -161,7 +161,7 @@ Resources:
     Properties:
       TemplateURL: !Sub
         - >-
-          ${TemplateS3URL}/${TemplateBucketName}/${TemplateBucketPrefix}/templates/transit-vpc.cfn.yml
+          ${TemplateS3URL}/${TemplateBucketName}/templates/transit-vpc.cfn.yml
         - TemplateS3URL: !FindInMap
             - AWSInfoRegionMap
             - !Ref 'AWS::Region'
