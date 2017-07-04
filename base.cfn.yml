@@ -146,26 +146,6 @@ Resources:
             - AWSInfoRegionMap
             - !Ref 'AWS::Region'
             - QuickStartS3URL
-  CredstashStack:
-    Type: 'AWS::CloudFormation::Stack'
-    Properties:
-      TemplateURL: !Sub
-        - >-
-          ${TemplateS3URL}/${TemplateBucketName}/templates/credstash.cfn.yml
-        - TemplateS3URL: !FindInMap
-            - AWSInfoRegionMap
-            - !Ref 'AWS::Region'
-            - QuickStartS3URL
-  TransitVPCStack:
-    Type: 'AWS::CloudFormation::Stack'
-    Properties:
-      TemplateURL: !Sub
-        - >-
-          ${TemplateS3URL}/${TemplateBucketName}/templates/transit-vpc.cfn.yml
-        - TemplateS3URL: !FindInMap
-            - AWSInfoRegionMap
-            - !Ref 'AWS::Region'
-            - QuickStartS3URL
 Outputs:
   TemplateType:
     Value: Base Account Stack
