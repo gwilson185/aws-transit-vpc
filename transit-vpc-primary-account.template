@@ -30,6 +30,11 @@
       "Type" : "String",
       "Default" : "true"
     },
+    "RDTag" : {
+      "Description" : "Tag to use to identify spoke VPCs Routing Domain in the Transit VPC.",
+      "Type" : "String",
+      "Default" : "transitvpc:rd"
+    },
     "BgpAsn" : {
       "Description" : "BGP ASN to use for Transit VPC.",
       "Type" : "String",
@@ -105,7 +110,7 @@
       },
       {
         "Label" : { "default" : "Network Configuration" },
-        "Parameters" : [ "VpcCidr", "PubSubnet1", "PubSubnet2","BgpAsn","SpokeTag","SpokeTagValue","PreferredPathTag" ]
+        "Parameters" : [ "VpcCidr", "PubSubnet1", "PubSubnet2","BgpAsn","SpokeTag","SpokeTagValue","RDTag","PreferredPathTag" ]
       },
       {
         "Label": { "default": "Anonymous Metrics Request" },
@@ -116,6 +121,7 @@
       "BgpAsn" : { "default" : "Transit VPC BGP ASN" },
       "SpokeTag" : { "default" : "Spoke VPC Tag Name" },
       "SpokeTagValue" : { "default" : "Spoke VPC Tag Value" },
+       "RDTag" : {"default" : "Route Domain Tag Name"},
       "PreferredPathTag" : { "default" : "Preferred VPN Endpoint Tag Name" },
       "VpcCidr" : { "default" : "Transit VPC CIDR Block" },
       "PubSubnet1" : { "default" : "1st Subnet Network" },
@@ -698,6 +704,7 @@
 		    "'PREFERRED_PATH_TAG':'",{ "Ref" : "PreferredPathTag" },"',",
 		    "'HUB_TAG':'",{ "Ref" : "SpokeTag" },"',",
 		    "'HUB_TAG_VALUE':'",{ "Ref" : "SpokeTagValue" },"',",
+            "'RD_TAG':'",{ "Ref" : "RDTag" },"','",
 		    "'USER_NAME':'",{ "Fn::FindInMap" : [ "Function", "Csr", "UserName"]},"',",
 		    "'PRIVATE_KEY':'",{ "Fn::FindInMap" : [ "Function", "Csr", "PrivateKey"]},"',",
 		    "'PUBLIC_KEY':'",{ "Fn::GetAtt" : [ "CreateRsaKey", "PubKey" ] },"',",
@@ -916,6 +923,10 @@
     "SpokeVPCTagValue" : {
       "Description" : "Tag valued used to idenfity spoke VPCs.",
       "Value" : { "Ref": "SpokeTagValue" } 
+    },
+    "RDTag" : {
+      "Description" : "Tag used to identify spoke VPCs Route Domain.",
+      "Value" : { "Ref": "RDTag" }
     },
     "PreferredPathTagName" : {
       "Description" : "Tag used to identify the spoke VPC preferred path.",
