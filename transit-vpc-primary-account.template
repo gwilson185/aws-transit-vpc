@@ -191,6 +191,27 @@
     }
   },
   "Resources" : {
+    "RouteDomainList" : {
+      "Type" : "AWS::DynamoDB::Table"
+      "Properties" : {
+        "AttributeDefinitions" :[
+          {
+            AttributeName: "rd_name"
+            KeyType: "S"
+          }
+          ]
+          "KeySchema" :[
+          {
+            AttributeName: "rd_name"
+            KeyType: "HASH"
+          }
+            ]
+          "ProvisionedThroughput" : {
+          "ReadCapacityUnits" : "5",
+          "WriteCapacityUnits" : "5"
+        }
+      }
+    }
     "VPNConfigS3Bucket" : {
       "Type" : "AWS::S3::Bucket"
     },
@@ -709,6 +730,7 @@
 		    "'PRIVATE_KEY':'",{ "Fn::FindInMap" : [ "Function", "Csr", "PrivateKey"]},"',",
 		    "'PUBLIC_KEY':'",{ "Fn::GetAtt" : [ "CreateRsaKey", "PubKey" ] },"',",
 		    "'PASSWORD':'",{ "Fn::GetAtt" : [ "CreateRandomPassword" , "Password" ] },"',",
+            "'RD_LIST':'",{ "Ref" : "RouteDomainList"},"',",
 		    "'KMS_KEY':'arn:aws:kms:",{"Ref" : "AWS::Region"},":",{ "Ref" : "AWS::AccountId" }, ":key/", { "Ref" : "KMSKey" },"'",
 		    "}\"",
 		"}]"
