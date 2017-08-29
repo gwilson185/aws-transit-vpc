@@ -14,14 +14,16 @@
 import boto3
 from botocore.client import Config
 import paramiko
+import json
 from xml.dom import minidom
 import ast
 import time
 import os
 import string
 import logging
+from boto3.dynamodb.conditions import Key, Attr
 log = logging.getLogger()
-log.setLevel(logging.INFO)
+log.setLevel(logging.DEBUG)
 
 config_file='transit_vpc_config.txt'
 #These S3 endpoint URLs are provided to support VPC endpoints for S3 in regions such as Frankfort that require explicit region endpoint definition
@@ -73,6 +75,33 @@ def getNextTunnelId(ssh):
     if lastTunnelNum == '':
         return 1
     return int(lastTunnelNum) + 1
+
+def getNextRouteId(ssh,bgp_asn):
+    log.info('Start getNextRouteId')
+    ssh.send('term len 0\n')
+    log.debug("%s",prompt(ssh))
+    #ssh.send('config t\n')
+    #log.debug("%s",prompt(ssh))
+    ssh.send('sh run | include rd ' + str(bgp_asn) + '\n')
+    log.info('Ran command for Route Domain list on Router')
+    output = prompt(ssh)
+    log.debug("%s",output)
+    #ssh.send('exit\n')
+    #log.info("%s",prompt(ssh))
+    lastRouteNum = 0
+    output = output.split('\n')
+    #Removes StdIn line and the last line which is the command prompt
+    output = output[1:-1]
+    log.info("%s", output)
+    #lines = [line.lstrip(':') for line in output]
+    existingRD = [x.strip().split(':')[1] for x in output]
+    log.debug("Routing IDs found %s",existingRD)
+    existingRD.sort()
+    for rd in existingRD:
+        if int(rd) == lastRouteNum:
+            lastRouteNum = lastRouteNum + 1
+    log.info('New Route Domain ID is %s',lastRouteNum)
+    return lastRouteNum
 
 # Logic to figure out existing tunnel IDs
 def getExistingTunnelId(ssh,vpn_connection_id):
@@ -169,6 +198,7 @@ def create_cisco_config(bucket_name, bucket_key, s3_url, bgp_asn, ssh):
     vpn_endpoint = vpn_config.getElementsByTagName("vpn_endpoint")[0].firstChild.data
     vpn_status = vpn_config.getElementsByTagName("status")[0].firstChild.data
     preferred_path = vpn_config.getElementsByTagName("preferred_path")[0].firstChild.data
+    routedomain_asn = vpn_config.getElementsByTagName("domain_asn")[0].firstChild.data
 
     #Extract VPN connection information
     vpn_connection=xmldoc.getElementsByTagName('vpn_connection')[0]
@@ -215,9 +245,9 @@ def create_cisco_config(bucket_name, bucket_key, s3_url, bgp_asn, ssh):
     else:
       # Create global tunnel configuration
       config_text = ['ip vrf {}'.format(vpn_connection_id)]
-      config_text.append(' rd {}:{}'.format(bgp_asn, tunnelId))
-      config_text.append(' route-target export {}:0'.format(bgp_asn))
-      config_text.append(' route-target import {}:0'.format(bgp_asn))
+      config_text.append(' rd {}:{}'.format(bgp_asn, getNextRouteId(ssh,bgp_asn)))
+      config_text.append(' route-target export {}'.format(routedomain_asn))
+      config_text.append(' route-target import {}'.format(routedomain_asn))
       config_text.append('exit')
       # Check to see if a route map is needed for creating a preferred path
       if preferred_path != 'none':
@@ -307,21 +337,59 @@ def create_cisco_config(bucket_name, bucket_key, s3_url, bgp_asn, ssh):
     log.debug("Conversion complete")
     return config_text
 
+def create_route_config(bucket_name,bucket_prefix, bucket_key, s3_url, config, ssh, csr_name):
+    #Connect to DynamoDB
+    rdomain_db = boto3.resource('dynamodb')
+    rdomain_table = rdomain_db.Table(config['RD_LIST'])
+    s3 = boto3.client('s3', endpoint_url=s3_url,
+                      config=Config(s3={'addressing_style': 'virtual'}, signature_version='s3v4'))
+    #returns records without vrf_asn attribute
+    rd = rdomain_table.scan(FilterExpression=Attr('vrf_asn').not_exists())
+    log.info('Found %s Domains that need Routing Domain ASN IDs generated',(json.dumps(rd['Count'])))
+    if int(json.dumps(rd['Count'])) > 0:
+        for x in range(0, int(json.dumps(rd['Count']))):
+            d = json.loads(json.dumps(rd['Items'][x]))
+            log.info('Getting New Route ID')
+            nextRouteID = str(config['BGP_ASN']) + ':' + str(getNextRouteId(ssh,config['BGP_ASN']))
+            log.info('Updating DynamoDb with new ASN')
+            update = rdomain_table.update_item(Key={'rd_name': d['rd_name']}, UpdateExpression="set vrf_asn = :asn",
+                                               ExpressionAttributeValues={':asn': nextRouteID}, ReturnValues="UPDATED_NEW")
+            log.info('DynamoDB update completed...')
+            if update['Attributes']['vrf_asn'] == nextRouteID:
+                log.info('Successfully updated DynamoDB Table %s Route Domain %s with BGP ASN Domain ID %s',config['RD_LIST'],d['rd_name'],update['Attributes']['vrf_asn'])
+                route_config=['ip vrf {}'.format(d['rd_name'])]
+                route_config.append('rd {}'.format(nextRouteID))
+                route_config.append('exit')
+
+                s3.delete_object(Bucket=bucket_name,Key=bucket_key)
+                return route_config
+            else:
+                log.error('Error updating DynamoDB Table %s Route Domain %s with BGP ASN Domain ID %s',config['RD_LIST'],d['rd_name'],update['Attributes']['vrf_asn'])
+                return ''
+
+def get_route_config(bucket_name,bucket_key,s3_url):
+    s3 = boto3.client('s3', endpoint_url=s3_url,
+                      config=Config(s3={'addressing_style': 'virtual'}, signature_version='s3v4'))
+    config = s3.get_object(Bucket=bucket_name,Key=bucket_key)
+    return(config['Body'].read)
+
 def lambda_handler(event, context):
     record=event['Records'][0]
     bucket_name=record['s3']['bucket']['name']
     bucket_key=record['s3']['object']['key']
     bucket_region=record['awsRegion']
+    log.info('The bucket key is %s',bucket_key)
     bucket_prefix=getBucketPrefix(bucket_name, bucket_key)
     log.debug("Getting config")
     stime = time.time()
     config = getTransitConfig(bucket_name, bucket_prefix, endpoint_url[bucket_region], config_file)
+
     if 'CSR1' in bucket_key:
-        csr_ip=config['PIP1']
-        csr_name='CSR1'
-    else:
-        csr_ip=config['PIP2']
-        csr_name='CSR2'
+        csr_ip = config['PIP1']
+        csr_name = 'CSR1'
+    elif 'CSR2' in bucket_key:
+        csr_ip = config['PIP2']
+        csr_name = 'CSR2'
     log.info("--- %s seconds ---", (time.time() - stime))
     #Download private key file from secure S3 bucket
     downloadPrivateKey(bucket_name, bucket_prefix, endpoint_url[bucket_region], config['PRIVATE_KEY'])
@@ -333,29 +401,66 @@ def lambda_handler(event, context):
 
     c = paramiko.SSHClient()
     c.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-
-    log.info("Connecting to %s (%s)", csr_name, csr_ip)
-    stime = time.time()
-    try:
-      c.connect( hostname = csr_ip, username = config['USER_NAME'], pkey = k )
-      PubKeyAuth=True
-    except paramiko.ssh_exception.AuthenticationException:
-      log.error("PubKey Authentication Failed! Connecting with password")
-      c.connect( hostname = csr_ip, username = config['USER_NAME'], password = config['PASSWORD'] )
-      PubKeyAuth=False
-    log.info("--- %s seconds ---", (time.time() - stime))
-    log.debug("Connected to %s",csr_ip)
-    ssh = c.invoke_shell()
-    log.debug("%s",prompt(ssh))
-    log.debug("Creating config.")
-    stime = time.time()
-    csr_config = create_cisco_config(bucket_name, bucket_key, endpoint_url[bucket_region], config['BGP_ASN'], ssh)
-    log.info("--- %s seconds ---", (time.time() - stime))
-    log.info("Pushing config to router.")
-    stime = time.time()
-    pushConfig(ssh,csr_config)
-    log.info("--- %s seconds ---", (time.time() - stime))
-    ssh.close()
+    if 'newroute' in bucket_key:
+        stime = time.time()
+        log.info('Pushing Route config to router %s.',csr_name)
+        try:
+            c.connect(hostname=csr_ip, username=config['USER_NAME'], pkey=k)
+            PubKeyAuth = True
+        except paramiko.ssh_exception.AuthenticationException:
+            log.error("PubKey Authentication Failed! Connecting with password")
+            c.connect(hostname=csr_ip, username=config['USER_NAME'], password=config['PASSWORD'])
+            PubKeyAuth = False
+        log.info("--- %s seconds ---", (time.time() - stime))
+        log.debug("Connected to %s", csr_ip)
+        ssh = c.invoke_shell()
+        csr_config = create_route_config(bucket_name, bucket_prefix, bucket_key, endpoint_url[bucket_region], config, ssh, csr_name)
+        pushConfig(ssh, csr_config)
+        ssh.close()
+        if csr_name == 'CSR1':
+            csr_name = 'CSR2'
+            csr_ip = config['PIP2']
+        else:
+            csr_name = 'CSR1'
+            csr_ip = config['PIP1']
+        log.info("Connecting to %s (%s)", csr_name, csr_ip)
+        stime = time.time()
+        try:
+            c.connect(hostname=csr_ip, username=config['USER_NAME'], pkey=k)
+            PubKeyAuth = True
+        except paramiko.ssh_exception.AuthenticationException:
+            log.error("PubKey Authentication Failed! Connecting with password")
+            c.connect(hostname=csr_ip, username=config['USER_NAME'], password=config['PASSWORD'])
+            PubKeyAuth = False
+        log.info("--- %s seconds ---", (time.time() - stime))
+        log.debug("Connected to %s", csr_ip)
+        ssh = c.invoke_shell()
+        log.info('Pushing Route config to router %s.', csr_name)
+        pushConfig(ssh, csr_config)
+        log.info("--- %s seconds ---", (time.time() - stime))
+    else:
+        log.info("Connecting to %s (%s)", csr_name, csr_ip)
+        stime = time.time()
+        try:
+          c.connect( hostname = csr_ip, username = config['USER_NAME'], pkey = k )
+          PubKeyAuth=True
+        except paramiko.ssh_exception.AuthenticationException:
+          log.error("PubKey Authentication Failed! Connecting with password")
+          c.connect( hostname = csr_ip, username = config['USER_NAME'], password = config['PASSWORD'] )
+          PubKeyAuth=False
+        log.info("--- %s seconds ---", (time.time() - stime))
+        log.debug("Connected to %s",csr_ip)
+        ssh = c.invoke_shell()
+        log.debug("%s",prompt(ssh))
+        log.debug("Creating config.")
+        stime = time.time()
+        csr_config = create_cisco_config(bucket_name, bucket_key, endpoint_url[bucket_region], config['BGP_ASN'], ssh)
+        log.info("--- %s seconds ---", (time.time() - stime))
+        log.info("Pushing config to router.")
+        stime = time.time()
+        pushConfig(ssh,csr_config)
+        log.info("--- %s seconds ---", (time.time() - stime))
+        ssh.close()
 
     return
     {
