@@ -6,27 +6,26 @@ from botocore.vendored import requests
 
 dcx_client = boto3.client('directconnect')
 log = logging.getLogger()
-log.setLevel(logging.INFO)
+log.setLevel(logging.DEBUG)
 
 SUCCESS = 'SUCCESS'
 FAILED = 'FAILED'
 
 #Network Connection definitions for EDC
-vlan = 350
-asn = 65000
-BGPAuthKey = '0x9M3QVG.uNkgSjMZfViV7iF'
-amazonAddress = '169.254.255.1/30'
-customerAddress = '169.254.255.2/30'
-addressFamily = 'ipv4'
+
 
 def lambda_handler(event, context):
 
-  if (event.RequestType == 'Delete'):
-    response = send(event, context, SUCCESS, {}, None)
-  elif (event.RequestType == 'Create'):
-      response = send(event, context, createPrivateVIF(vgw, event['StackId'],vlan,asn,BGPAuthKey,amazonAddress,customerAddress,addressFamily))
+    log.debug("Recieved event: %s", event)
+    if (event['RequestType'] == 'Delete'):
+        #Waiting to see if I can get VifID back from CLoud Formation
+        delresp = deleteVIF(event['ResourceProperties']['VGW'])
+        response = send(event, context, delresp['Status'], {}, None)
+    elif (event['RequestType'] == 'Create'):
+        vifresponse = createPrivateVIF(event)
+        response = send(event, context, vifresponse['Status'],{'DCXVifId': vifresponse['virtualInterfaceID']})
 
-  return {'Response' : response}
+    return {'Response' : response}
 
 def send(event, context, responseStatus, responseData, physicalResourceId):
   responseUrl = event['ResponseURL']
@@ -36,8 +35,8 @@ def send(event, context, responseStatus, responseData, physicalResourceId):
 
   responseBody = {}
   responseBody['Status'] = responseStatus
-  responseBody['Reason'] = 'See the details in CloudWatch Log Stream: ' + context.log_stream_name
-  responseBody['PhysicalResourceId'] = physicalResourceId or context.log_stream_name
+  responseBody['Reason'] = 'See the details in CloudWatch Log Stream: ' + context['log_stream_name']
+  responseBody['PhysicalResourceId'] = physicalResourceId or context['log_stream_name']
   responseBody['StackId'] = event['StackId']
   responseBody['RequestId'] = event['RequestId']
   responseBody['LogicalResourceId'] = event['LogicalResourceId']
@@ -61,23 +60,41 @@ data=json_responseBody,headers=headers)
    log.error('send(..) failed executing requests.put(..): ' + str(e))
    return FAILED
 
-def createPrivateVIF(vgw, stackid, vlan, asn, BGPAuthKey, amazonAddress, customerAddress, addressFamily):
+def createPrivateVIF(event):
     vifcreate = dcx_client.create_private_virtual_interface(connectionId=getConnectionId(),newPrivateVirtualInterface={
-        'virtualInterfaceName' : stackid,
-        'vlan' : vlan,
-        'asn' : asn,
-        'authKey' : BGPAuthKey,
-        'amazonAddress' : amazonAddress,
-        'customerAddress' : customerAddress,
-        'addressFamily' : addressFamily,
-        'virtualGatewayId' : vgw })
+        'virtualInterfaceName' : 'VIF-' + event['Stackid'].split[1],
+        'vlan' : event['ResourceProperties']['VLAN'],
+        'asn' : event['ResourceProperties']['ASN'],
+        'authKey' : event['ResourceProperties']['BGPAuthKey'],
+        'amazonAddress' : event['ResourceProperties']['AmazonAddress'],
+        'customerAddress' : event['ResourceProperties']['CustomerAddress'],
+        'addressFamily' : event['ResourceProperties']['AddressFamily'],
+        'virtualGatewayId' : event['ResourceProperties']['VGW'] })
+    log.debug("Created DCX VIF: %s", vifcreate)
 
-    while getVIFStatus(vifcreate['connectId'],vifcreate['virtualInterfaceID']) == 'pending':
+    while getVIFStatus(vifcreate['virtualInterfaceID']) == 'pending':
+        log.debug("waiting 5 seconds for change in status....")
         time.sleep(5)
 
-    if getVIFStatus(vifcreate['connectId'],vifcreate['virtualInterfaceID']) == 'available':
-        return SUCCESS
-    else: return FAILED
+    if getVIFStatus(vifcreate['virtualInterfaceID']) == 'available':
+        log.info("VIF is available.")
+        return {'Status': SUCCESS, 'VIF_ID': vifcreate['virtualInterfaceID']}
+    else:
+        log.info("VIF Creation failed!")
+        return {'Status': FAILED, 'VIF_ID': vifcreate['virtualInterfaceID']}
+
+def deleteVIF(vgw):
+    vifdelete = dcx_client.delete_virtual_interface(virtualInterfaceId=findVifID(vgw))
+    while getVIFStatus(vifdelete['virtualInterfaceID']) == 'deleting':
+        log.debug("waiting 5 seconds for change in status....")
+        time.sleep(5)
+
+    if getVIFStatus(vifdelete['virtualInterfaceID']) == 'deleted':
+        log.info("VIF Deleted...")
+        return {'Status': SUCCESS}
+    else:
+        log.info("VIF deletion failed!")
+        return {'Status': FAILED}
 
 def getConnectionId():
     resp = dcx_client.describe_connections()
@@ -88,8 +105,15 @@ def getConnectionId():
     else:
      log.error('Not enough Logic to determine DCX Connection ID')
 
-def getVIFStatus(connectionId, vif_id):
-    resp = dcx_client.describe_virtual_interfaces(connectionId=connectionId,virtualInterfaceId=vif_id)
+def findVifId(vgw):
+    resp = dcx_client.describe_virtual_interfaces()
+    for vif in resp['virtualInterfaces']:
+      if vif['virtualGatewayId'] == vgw:
+        log.info('DirectConnect Virtual Interface ID %s Found', vif['virtualInterfaceId'])
+        return vif['virtualInterfaceId']
+
+def getVIFStatus(vif_id):
+    resp = dcx_client.describe_virtual_interfaces(virtualInterfaceId=vif_id)
     if len(resp['virtualInterfaces']) == 1:
         vif = resp['virtualInterfaces'][0]
         return vif['virtualInterfaceState']
