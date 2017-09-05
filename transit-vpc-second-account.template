@@ -1,6 +1,6 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description" : "(SO0001p) - Transit VPC: This template creates a TransitVPC poller function to find spoke VPCs to add to the transit network."
+  "Description" : "(SO0001p) - Transit VPC: This template creates a TransitVPC poller function to find spoke VPCs to add to the transit network.",
   "Parameters" : {
     "BucketName" : {
       "Description" : "Name of the bucket used to store transit VPC configuration files.",
@@ -18,7 +18,7 @@
     "Default": "transitvpc:rd"
   },
   "RouteDomainList" : {
-  "Description": "ARN for Dynamo Table that has Routing Domains"
+  "Description": "ARN for Dynamo Table that has Routing Domains",
   "Type" : "String",
   "Default" : "ARN"
   }
