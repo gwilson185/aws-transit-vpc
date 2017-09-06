@@ -1,10 +1,13 @@
+import json
 import logging
 import time
-import boto3
-import json
-from botocore.vendored import requests
 
-dcx_client = boto3.client('directconnect')
+import dcx_helper.boto3
+import dcx_helper.requests
+from dcx_helper.botocore.vendored import dcx_helper
+.requests
+
+dcx_client = dcx_helper.boto3.client('directconnect')
 log = logging.getLogger()
 log.setLevel(logging.DEBUG)
 
@@ -52,8 +55,8 @@ def send(event, context, responseStatus, responseData, physicalResourceId):
 }
 
   try:
-   response = requests.put(responseUrl,
-data=json_responseBody,headers=headers)
+   response = dcx_helper.requests.put(responseUrl,
+                                      data=json_responseBody, headers=headers)
    log.info('Status code: ' + str(response.reason))
    return SUCCESS
   except Exception as e:
