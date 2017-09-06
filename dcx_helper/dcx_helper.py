@@ -1,13 +1,12 @@
 import json
 import logging
 import time
+import cfnresponse
+import boto3
+import requests
+from botocore.vendored import requests
 
-import dcx_helper.boto3
-import dcx_helper.requests
-from dcx_helper.botocore.vendored import dcx_helper
-.requests
-
-dcx_client = dcx_helper.boto3.client('directconnect')
+dcx_client = boto3.client('directconnect')
 log = logging.getLogger()
 log.setLevel(logging.DEBUG)
 
@@ -19,9 +18,10 @@ FAILED = 'FAILED'
 
 def lambda_handler(event, context):
 
-    log.debug("Recieved event: %s", event)
+    log.debug("Received event: %s", event)
+    log.debug("Context included: %s", context)
     if (event['RequestType'] == 'Delete'):
-        #Waiting to see if I can get VifID back from CLoud Formation
+        #Waiting to see if I can get VifID back from CLoud Formation context
         delresp = deleteVIF(event['ResourceProperties']['VGW'])
         response = send(event, context, delresp['Status'], {}, None)
     elif (event['RequestType'] == 'Create'):
@@ -55,7 +55,7 @@ def send(event, context, responseStatus, responseData, physicalResourceId):
 }
 
   try:
-   response = dcx_helper.requests.put(responseUrl,
+   response = requests.put(responseUrl,
                                       data=json_responseBody, headers=headers)
    log.info('Status code: ' + str(response.reason))
    return SUCCESS
@@ -87,7 +87,7 @@ def createPrivateVIF(event):
         return {'Status': FAILED, 'VIF_ID': vifcreate['virtualInterfaceID']}
 
 def deleteVIF(vgw):
-    vifdelete = dcx_client.delete_virtual_interface(virtualInterfaceId=findVifID(vgw))
+    vifdelete = dcx_client.delete_virtual_interface(virtualInterfaceId=findVifId(vgw))
     while getVIFStatus(vifdelete['virtualInterfaceID']) == 'deleting':
         log.debug("waiting 5 seconds for change in status....")
         time.sleep(5)
