@@ -21,7 +21,7 @@ def lambda_handler(event, context):
 
     if (event['RequestType'] == 'Delete'):
         delresp = deleteVIF(event['PhysicalResourceId'])
-        response = send(event, context, delresp['Status'], {}, None)
+        response = send(event, context, delresp['Status'], {}, event['PhysicalResourceId'])
 
     elif (event['RequestType'] == 'Create'):
         vifresponse = createPrivateVIF(event)
@@ -30,7 +30,7 @@ def lambda_handler(event, context):
     elif (event['RequestType'] == 'Update'):
         delresp=deleteVIF(event['PhysicalResourceId'])
         if delresp['Status'] == SUCCESS:
-          while getVIFStatus(event['PhysicalResourceId']) in ['deleting','None']:
+          while getVIFStatus(event['PhysicalResourceId']) == 'deleting':
               time.sleep(5)
         vifresponse = createPrivateVIF(event)
         response = send(event, context, vifresponse['Status'], {'DCXVifId': vifresponse['virtualInterfaceId']},

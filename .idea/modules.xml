@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/../D3 Infrastructure/CloudFormation/.idea/CloudFormation.iml" filepath="$PROJECT_DIR$/../D3 Infrastructure/CloudFormation/.idea/CloudFormation.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/aws-transit-vpc.iml" filepath="$PROJECT_DIR$/.idea/aws-transit-vpc.iml" />
     </modules>
   </component>
