@@ -270,10 +270,9 @@
   "Mappings": {
     "Function": {
       "DCX-Helper": {
-        "CodeLocation": "edc-lambdacode/dcx-helper.py",
         "CodeRegion": "us-east-1",
         "Name": "dcxhelper",
-        "Decription": "This function is invoked in Cloudformation to Create or Delete DCX VIFs",
+        "Description": "This function is invoked in Cloudformation to Create or Delete DCX VIFs",
         "Runtime": "python2.7",
         "Timeout": "300",
         "MemorySize": "128"
@@ -868,12 +867,12 @@
     },
     "VGWRoutePropagation": {
       "Type": "AWS::EC2::VPNGatewayRoutePropagation",
+      "DependsOn" : "AttachVGWGateway",
       "Properties": {
-        "RouteTableIds": [
+        "RouteTableIds":[
           {
             "Ref": "VPCRouteTable"
-          }
-        ],
+          }],
         "VpnGatewayId": {
           "Ref": "TransitVGW"
         }
@@ -2109,22 +2108,60 @@
       "Type": "AWS::Lambda::Function",
       "DependsOn": "DCXHelperRolePolicy",
       "Properties": {
-        "Code": {
-          "Fn::FindInMap": [
-            "Function",
-            "DCX-Helper",
-            "CodeLocation"
+        "FunctionName": {
+          "Fn::Join": [
+            "",
+            [
+              {
+                "Ref": "AWS::StackName"
+              },
+              "-",
+              {
+                "Fn::FindInMap": [
+                  "Function",
+                  "DCX-Helper",
+                  "Name"
+                ]
+              }
+            ]
           ]
         },
-        "Handler": "lambda.handler",
+          "Code": {"S3Bucket": "edc-lambdacode", "S3Key" :"dcx-helper.zip" },
+        "Handler": "dcx-helper.lambda_handler",
         "Role": {
           "Fn::GetAtt": [
             "DCXHelperRole",
             "Arn"
           ]
         },
-        "Runtime": "python2.7",
-        "Timeout": "600"
+        "Runtime": {
+          "Fn::FindInMap": [
+            "Function",
+            "DCX-Helper",
+            "Runtime"
+          ]
+        },
+        "Description": {
+          "Fn::FindInMap": [
+            "Function",
+            "DCX-Helper",
+            "Description"
+          ]
+        },
+        "Timeout": {
+          "Fn::FindInMap": [
+            "Function",
+            "DCX-Helper",
+            "Timeout"
+          ]
+        },
+        "MemorySize": {
+          "Fn::FindInMap": [
+            "Function",
+            "DCX-Helper",
+            "MemorySize"
+          ]
+        }
       }
     },
     "DCXHelperRole": {
