@@ -1,13 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="5f3ad718-1dea-4a3a-8669-cd1299134e66" name="Default" comment="add basic vpc template">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dcx-helper.zip" afterPath="$PROJECT_DIR$/dcx-helper.zip" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/aws-transit-vpc.iml" afterPath="$PROJECT_DIR$/.idea/aws-transit-vpc.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/modules.xml" afterPath="$PROJECT_DIR$/.idea/modules.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/vcs.xml" afterPath="$PROJECT_DIR$/.idea/vcs.xml" />
+    <list default="true" id="5f3ad718-1dea-4a3a-8669-cd1299134e66" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dcx-helper/dcx-helper.py" afterPath="$PROJECT_DIR$/dcx-helper/dcx-helper.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/account-perm-update.py" afterPath="$PROJECT_DIR$/account-perm-update.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/transit-vpc-push-cisco-config/LICENSE.txt" afterPath="$PROJECT_DIR$/transit-vpc-push-cisco-config/LICENSE.txt" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/transit-vpc-push-cisco-config/NOTICE.txt" afterPath="$PROJECT_DIR$/transit-vpc-push-cisco-config/NOTICE.txt" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/transit-vpc-push-cisco-config/ecdsa-0.13.dist-info/RECORD" afterPath="$PROJECT_DIR$/transit-vpc-push-cisco-config/ecdsa-0.13.dist-info/RECORD" />
@@ -27,110 +23,36 @@
   <component name="CoverageDataManager">
     <SUITE FILE_PATH="coverage/aws_transit_vpc$scratch_2.coverage" NAME="scratch_2 Coverage Results" MODIFIED="1504632174879" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
     <SUITE FILE_PATH="coverage/aws_transit_vpc$scratch_3.coverage" NAME="scratch_3 Coverage Results" MODIFIED="1504818376423" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
-    <SUITE FILE_PATH="coverage/aws_transit_vpc$account_perm_update.coverage" NAME="account-perm-update Coverage Results" MODIFIED="1504207995039" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/aws_transit_vpc$account_perm_update.coverage" NAME="account-perm-update Coverage Results" MODIFIED="1505320911602" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="account-perm-update.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/account-perm-update.py">
+      <file leaf-file-name="transit-vpc-primary-account-existing-vpc.template" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/transit-vpc-primary-account-existing-vpc.template">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="885">
-              <caret line="59" column="29" lean-forward="false" selection-start-line="59" selection-start-column="29" selection-end-line="59" selection-end-column="29" />
+            <state relative-caret-position="188">
+              <caret line="201" column="30" lean-forward="false" selection-start-line="201" selection-start-column="30" selection-end-line="201" selection-end-column="30" />
               <folding>
-                <element signature="e#0#12#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="transit-vpc-primary-account.template" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/transit-vpc-primary-account.template">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="174">
-              <caret line="2207" column="42" lean-forward="true" selection-start-line="2207" selection-start-column="42" selection-end-line="2207" selection-end-column="42" />
-              <folding>
-                <element signature="n#!!block;n#KeyName#0;n#!!block;n#Parameters#0;n#!!top" expanded="false" />
-                <element signature="n#!!block;n#TerminationProtection#0;n#!!block;n#Parameters#0;n#!!top" expanded="false" />
-                <element signature="n#!!block;n#PreferredPathTag#0;n#!!block;n#Parameters#0;n#!!top" expanded="false" />
-                <element signature="n#!!block;n#SpokeTag#0;n#!!block;n#Parameters#0;n#!!top" expanded="false" />
-                <element signature="n#!!block;n#SpokeTagValue#0;n#!!block;n#Parameters#0;n#!!top" expanded="false" />
-                <element signature="n#!!block;n#RDTag#0;n#!!block;n#Parameters#0;n#!!top" expanded="false" />
-                <element signature="n#!!block;n#BgpAsn#0;n#!!block;n#Parameters#0;n#!!top" expanded="false" />
-                <element signature="n#!!block;n#VpcCidr#0;n#!!block;n#Parameters#0;n#!!top" expanded="false" />
-                <element signature="n#!!block;n#PubSubnet1#0;n#!!block;n#Parameters#0;n#!!top" expanded="false" />
-                <element signature="n#!!block;n#PubSubnet2#0;n#!!block;n#Parameters#0;n#!!top" expanded="false" />
-                <element signature="n#!!block;n#CSRType#0;n#!!block;n#Parameters#0;n#!!top" expanded="false" />
-                <element signature="n#!!block;n#LicenseModel#0;n#!!block;n#Parameters#0;n#!!top" expanded="false" />
-                <element signature="n#!!block;n#S3Prefix#0;n#!!block;n#Parameters#0;n#!!top" expanded="false" />
-                <element signature="n#!!block;n#AccountId#0;n#!!block;n#Parameters#0;n#!!top" expanded="false" />
-                <element signature="n#!!block;n#DCXVLAN#0;n#!!block;n#Parameters#0;n#!!top" expanded="false" />
-                <element signature="n#!!block;n#DCXASN#0;n#!!block;n#Parameters#0;n#!!top" expanded="false" />
-                <element signature="n#!!block;n#DCXBGPAuthKey#0;n#!!block;n#Parameters#0;n#!!top" expanded="false" />
-                <element signature="n#!!block;n#DCXAWSAddress#0;n#!!block;n#Parameters#0;n#!!top" expanded="false" />
-                <element signature="n#!!block;n#DCXCustAddress#0;n#!!block;n#Parameters#0;n#!!top" expanded="false" />
-                <element signature="n#!!block;n#DCXIPFamily#0;n#!!block;n#Parameters#0;n#!!top" expanded="false" />
-                <element signature="n#!!block;n#SendAnonymousData#0;n#!!block;n#Parameters#0;n#!!top" expanded="false" />
-                <element signature="n#!!block;n#AuthorizeAnotherAccount#0;n#!!block;n#Conditions#0;n#!!top" expanded="false" />
-                <element signature="n#!!block;n#EnableTerm#0;n#!!block;n#Conditions#0;n#!!top" expanded="false" />
-                <element signature="n#!!block;n#SendData#0;n#!!block;n#Conditions#0;n#!!top" expanded="false" />
-                <element signature="n#!!block;n#AWS::CloudFormation::Interface#0;n#!!block;n#Metadata#0;n#!!top" expanded="false" />
-                <element signature="n#!!block;n#Function#0;n#!!block;n#Mappings#0;n#!!top" expanded="false" />
-                <element signature="n#!!block;n#Csr#0;n#!!block;n#Function#0;n#!!block;n#Mappings#0;n#!!top" expanded="false" />
-                <element signature="n#!!block;n#CiscoCsrAMI#0;n#!!block;n#Mappings#0;n#!!top" expanded="false" />
-                <element signature="n#!!block;n#CsrInstance#0;n#!!block;n#Mappings#0;n#!!top" expanded="false" />
-                <element signature="n#!!block;n#RouteDomainList#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
-                <element signature="n#!!block;n#VPNConfigS3Bucket#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+                <element signature="n#!!block;n#Metadata#0;n#!!top" expanded="false" />
+                <element signature="n#!!block;n#Mappings#0;n#!!top" expanded="false" />
                 <element signature="n#!!block;n#VPNConfigBucketPolicy#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
                 <element signature="n#!!block;n#KMSKey#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
                 <element signature="n#!!block;n#KMSKeyAlias#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
-                <element signature="n#!!block;n#TransitVGW#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
-                <element signature="n#!!block;n#TransitVPC#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
-                <element signature="n#!!block;n#AttachVGWGateway#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
-                <element signature="n#!!block;n#VPCPubSub1#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
-                <element signature="n#!!block;n#VPCPubSub2#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
-                <element signature="n#!!block;n#IGW#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
-                <element signature="n#!!block;n#IGWToInternet#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
-                <element signature="n#!!block;n#VPCRouteTable#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
-                <element signature="n#!!block;n#VPCPublicRoute#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
                 <element signature="n#!!block;n#S3Endpoint#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
-                <element signature="n#!!block;n#DynamoDBEndpoint#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
-                <element signature="n#!!block;n#VPCPubSubnetRouteTableAssociation1#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
-                <element signature="n#!!block;n#VPCPubSubnetRouteTableAssociation2#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
-                <element signature="n#!!block;n#CsrEip1#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
                 <element signature="n#!!block;n#CsrEip2#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
                 <element signature="n#!!block;n#VpcCsr1#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
                 <element signature="n#!!block;n#VpcCsr2#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
                 <element signature="n#!!block;n#SolutionHelperRole#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
                 <element signature="n#!!block;n#SolutionHelperRolePolicy#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
-                <element signature="n#!!block;n#PolicyDocument#0;n#!!block;n#Properties#0;n#!!block;n#SolutionHelperRolePolicy#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
-                <element signature="n#!!block;n#S3Bucket#0;n#!!block;n#Code#0;n#!!block;n#Properties#0;n#!!block;n#SolutionHelper#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+                <element signature="n#!!block;n#SolutionHelper#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
                 <element signature="n#!!block;n#CreateRsaKey#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
                 <element signature="n#!!block;n#CreateRandomPassword#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
                 <element signature="n#!!block;n#CiscoConfigFunctionRole#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
                 <element signature="n#!!block;n#CiscoConfigFunctionRolePolicy#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
                 <element signature="n#!!block;n#CiscoConfigFunct#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
-                <element signature="n#!!block;n#ServiceToken#0;n#!!block;n#Properties#0;n#!!block;n#CiscoConfigFunct#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
-                <element signature="n#!!block;n#LambdaCode#0;n#!!block;n#Properties#0;n#!!block;n#CiscoConfigFunct#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
-                <element signature="n#!!block;n#LambdaCodeRegion#0;n#!!block;n#Properties#0;n#!!block;n#CiscoConfigFunct#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
-                <element signature="e#41074#41397#0" expanded="false" />
-                <element signature="n#!!block;n#Runtime#0;n#!!block;n#Properties#0;n#!!block;n#CiscoConfigFunct#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
-                <element signature="n#!!block;n#Description#0;n#!!block;n#Properties#0;n#!!block;n#CiscoConfigFunct#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
-                <element signature="n#!!block;n#Timeout#0;n#!!block;n#Properties#0;n#!!block;n#CiscoConfigFunct#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
-                <element signature="n#!!block;n#MemorySize#0;n#!!block;n#Properties#0;n#!!block;n#CiscoConfigFunct#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
-                <element signature="n#!!block;n#VpcConfig#0;n#!!block;n#Properties#0;n#!!block;n#CiscoConfigFunct#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
-                <element signature="n#!!block;n#S3Event#0;n#!!block;n#Properties#0;n#!!block;n#CiscoConfigFunct#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
-                <element signature="e#43606#47072#0" expanded="false" />
                 <element signature="n#!!block;n#TransitVpcPollerRole#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
                 <element signature="n#!!block;n#TransitVpcPollerRolePolicy#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
                 <element signature="n#!!block;n#PollerFunct#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
-                <element signature="n#!!block;n#CloudWatchEvent#0;n#!!block;n#Properties#0;n#!!block;n#PollerFunct#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
-                <element signature="n#!!block;n#FindReplace#0;n#!!block;n#Properties#0;n#!!block;n#PollerFunct#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
-                <element signature="n#!!block;n#DCXVif#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
-                <element signature="n#!!block;n#DCXHelperFunction#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
-                <element signature="n#!!block;n#FunctionName#0;n#!!block;n#Properties#0;n#!!block;n#DCXHelperFunction#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
-                <element signature="n#!!block;n#DCXHelperRole#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
-                <element signature="e#56450#56703#0" expanded="false" />
-                <element signature="n#!!block;n#CSRSecurityGroup#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
                 <element signature="n#!!block;n#CiscoConfigSecurityGroup#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
                 <element signature="n#!!block;n#SSHtoCSR#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
                 <element signature="n#!!block;n#CSR1RecoveryAlarm#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
@@ -143,63 +65,26 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Network.template" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../D3 Infrastructure/CloudFormation/Cloud Formation/Network.template">
+      <file leaf-file-name="account-perm-update.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/account-perm-update.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="330">
-              <caret line="496" column="1" lean-forward="false" selection-start-line="496" selection-start-column="1" selection-end-line="496" selection-end-column="1" />
+            <state relative-caret-position="1350">
+              <caret line="102" column="18" lean-forward="false" selection-start-line="102" selection-start-column="18" selection-end-line="102" selection-end-column="18" />
               <folding>
-                <element signature="e#377#2768#0" expanded="false" />
-                <element signature="e#2803#5353#0" expanded="false" />
-                <element signature="e#5382#6989#0" expanded="false" />
-                <element signature="e#7012#14522#0" expanded="false" />
-                <element signature="e#7311#7540#0" expanded="false" />
-                <element signature="e#7574#8203#0" expanded="false" />
-                <element signature="e#8223#8852#0" expanded="false" />
-                <element signature="e#8872#9509#0" expanded="false" />
-                <element signature="e#9534#9860#0" expanded="false" />
-                <element signature="e#9879#10093#0" expanded="false" />
-                <element signature="e#10119#10493#0" expanded="false" />
-                <element signature="e#10514#10802#0" expanded="false" />
-                <element signature="e#10846#11073#0" expanded="false" />
-                <element signature="e#11118#11345#0" expanded="false" />
-                <element signature="e#11390#11617#0" expanded="false" />
-                <element signature="e#11643#12017#0" expanded="false" />
-                <element signature="e#12059#12436#0" expanded="false" />
-                <element signature="e#12479#12858#0" expanded="false" />
-                <element signature="e#12905#13287#0" expanded="false" />
-                <element signature="e#13326#13704#0" expanded="false" />
-                <element signature="e#13748#13975#0" expanded="false" />
-                <element signature="e#14019#14246#0" expanded="false" />
-                <element signature="e#14290#14517#0" expanded="false" />
-                <element signature="e#14536#14783#0" expanded="false" />
+                <element signature="e#0#12#0" expanded="true" />
+                <element signature="e#1712#1928#0" expanded="false" />
+                <element signature="e#2012#2391#0" expanded="false" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="LambdaAMILookupSample.template" pinned="false" current-in-tab="false">
-        <entry file="file://$USER_HOME$/Downloads/LambdaAMILookupSample.template">
+      <file leaf-file-name="testjson.json" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/testjson.json">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-98">
-              <caret line="29" column="0" lean-forward="false" selection-start-line="29" selection-start-column="0" selection-end-line="29" selection-end-column="0" />
-              <folding>
-                <element signature="n#!!block;n#AWSInstanceType2Arch#0;n#!!block;n#Mappings#0;n#!!top" expanded="false" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="dcx-helper.py" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/dcx-helper/dcx-helper.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-526">
-              <caret line="20" column="0" lean-forward="true" selection-start-line="20" selection-start-column="0" selection-end-line="20" selection-end-column="0" />
-              <folding>
-                <element signature="e#0#11#0" expanded="true" />
-                <element signature="e#1396#2426#0" expanded="false" />
-                <element signature="e#3999#4315#0" expanded="false" />
-              </folding>
+            <state relative-caret-position="15">
+              <caret line="1" column="0" lean-forward="true" selection-start-line="1" selection-start-column="0" selection-end-line="1" selection-end-column="0" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -207,28 +92,8 @@
       <file leaf-file-name="scratch_2.py" pinned="false" current-in-tab="false">
         <entry file="file://$APPLICATION_CONFIG_DIR$/scratches/scratch_2.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="104">
+            <state relative-caret-position="105">
               <caret line="7" column="31" lean-forward="false" selection-start-line="7" selection-start-column="31" selection-end-line="7" selection-end-column="31" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="transit-vpc-poller.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/transit-vpc-poller.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="transit-vpc-push-cisco-config.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/transit-vpc-push-cisco-config/transit-vpc-push-cisco-config.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-6417">
-              <caret line="19" column="11" lean-forward="true" selection-start-line="19" selection-start-column="11" selection-end-line="19" selection-end-column="11" />
               <folding />
             </state>
           </provider>
@@ -237,7 +102,7 @@
       <file leaf-file-name="scratch_3.py" pinned="false" current-in-tab="false">
         <entry file="file://$APPLICATION_CONFIG_DIR$/scratches/scratch_3.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="351">
+            <state relative-caret-position="690">
               <caret line="54" column="40" lean-forward="false" selection-start-line="54" selection-start-column="40" selection-end-line="54" selection-end-column="40" />
               <folding>
                 <element signature="e#2690#2986#0" expanded="false" />
@@ -250,8 +115,44 @@
         <entry file="file://$APPLICATION_CONFIG_DIR$/scratches/scratch_4.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="45">
-              <caret line="3" column="36" lean-forward="true" selection-start-line="3" selection-start-column="36" selection-end-line="3" selection-end-column="36" />
+              <caret line="3" column="36" lean-forward="false" selection-start-line="3" selection-start-column="36" selection-end-line="3" selection-end-column="36" />
               <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="transit-vpc-poller.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/transit-vpc-poller.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-2335">
+              <caret line="1" column="5" lean-forward="false" selection-start-line="1" selection-start-column="4" selection-end-line="1" selection-end-column="5" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="transit-vpc-second-account.template" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/transit-vpc-second-account.template">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="231">
+              <caret line="42" column="0" lean-forward="false" selection-start-line="42" selection-start-column="0" selection-end-line="42" selection-end-column="0" />
+              <folding>
+                <element signature="n#!!block;n#Mappings#0;n#!!top" expanded="false" />
+                <element signature="n#!!block;n#SolutionHelperRole#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+                <element signature="n#!!block;n#SolutionHelper#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="aws-cross-account-manager-sub.template" pinned="false" current-in-tab="true">
+        <entry file="file://$USER_HOME$/Downloads/aws-cross-account-manager-sub.template">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-423">
+              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+              <folding>
+                <element signature="n#!!block;n#Properties#0;n#!!block;n#InitSubAccountExecRole#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -272,6 +173,8 @@
       <find>id</find>
       <find>ID</find>
       <find>context</find>
+      <find>AuthorizeAnotherAccount</find>
+      <find>strip</find>
     </findStrings>
   </component>
   <component name="Git.Rebase.Settings">
@@ -288,7 +191,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/account-perm-update.py" />
         <option value="$APPLICATION_CONFIG_DIR$/scratches/scratch_2.py" />
         <option value="$PROJECT_DIR$/dcx.py" />
         <option value="$PROJECT_DIR$/dcx_helper.py" />
@@ -298,6 +200,8 @@
         <option value="$APPLICATION_CONFIG_DIR$/scratches/scratch_3.py" />
         <option value="$PROJECT_DIR$/transit-vpc-primary-account.template" />
         <option value="$PROJECT_DIR$/dcx-helper/dcx-helper.py" />
+        <option value="$PROJECT_DIR$/testjson.json" />
+        <option value="$PROJECT_DIR$/account-perm-update.py" />
       </list>
     </option>
   </component>
@@ -308,8 +212,8 @@
     <sorting>DEFINITION_ORDER</sorting>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="1448" />
-    <option name="y" value="182" />
+    <option name="x" value="1447" />
+    <option name="y" value="180" />
     <option name="width" value="1771" />
     <option name="height" value="817" />
   </component>
@@ -329,14 +233,19 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="Scratches" />
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
             <path>
               <item name="aws-transit-vpc" type="b2602c69:ProjectViewProjectNode" />
               <item name="aws-transit-vpc" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="aws-transit-vpc" type="b2602c69:ProjectViewProjectNode" />
+              <item name="aws-transit-vpc" type="462c0819:PsiDirectoryNode" />
+              <item name="transit-vpc-push-cisco-config" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -369,7 +278,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.scratch_3">
+  <component name="RunManager" selected="Python.account-perm-update">
     <configuration name="account-perm-update" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -431,9 +340,9 @@
     </list>
     <recent_temporary>
       <list size="3">
-        <item index="0" class="java.lang.String" itemvalue="Python.scratch_3" />
-        <item index="1" class="java.lang.String" itemvalue="Python.scratch_2" />
-        <item index="2" class="java.lang.String" itemvalue="Python.account-perm-update" />
+        <item index="0" class="java.lang.String" itemvalue="Python.account-perm-update" />
+        <item index="1" class="java.lang.String" itemvalue="Python.scratch_3" />
+        <item index="2" class="java.lang.String" itemvalue="Python.scratch_2" />
       </list>
     </recent_temporary>
   </component>
@@ -528,7 +437,14 @@
       <option name="project" value="LOCAL" />
       <updated>1504844568172</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="revised dcx-helper logic">
+      <created>1504876489094</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1504876489094</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="TodoView">
@@ -541,27 +457,26 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="1448" y="182" width="1771" height="817" extended-state="0" />
-    <editor active="true" />
+    <frame x="1447" y="180" width="1771" height="817" extended-state="0" />
     <layout>
-      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32904148" sideWeight="0.4979757" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32904148" sideWeight="0.5020243" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.26142278" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32904148" sideWeight="0.4979757" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32904148" sideWeight="0.5043378" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32904148" sideWeight="0.49566224" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32904148" sideWeight="0.4979757" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32904148" sideWeight="0.4979757" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32904148" sideWeight="0.4979757" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2556391" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24985541" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32904148" sideWeight="0.4979757" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Data View" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32904148" sideWeight="0.4979757" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
     </layout>
     <layout-to-restore>
@@ -608,58 +523,138 @@
     <MESSAGE value="cleaned up dcx_helper" />
     <MESSAGE value="add basic vpc template" />
     <MESSAGE value="final dcx-helper" />
-    <option name="LAST_COMMIT_MESSAGE" value="final dcx-helper" />
+    <MESSAGE value="revised dcx-helper logic" />
+    <option name="LAST_COMMIT_MESSAGE" value="revised dcx-helper logic" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="2" />
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$USER_HOME$/Downloads/develepment2-SolutionHelper-F25O13IQXQ2Y-cac3865e-c37a-40b1-b832-0752b435ca45/solution-helper.py</url>
+          <line>103</line>
+          <option name="timeStamp" value="2" />
+        </line-breakpoint>
+      </breakpoints>
+      <option name="time" value="4" />
     </breakpoint-manager>
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/account-perm-update.py">
+    <entry file="file://$PROJECT_DIR$/transit-vpc-primary-account.template">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        <state relative-caret-position="3765">
+          <caret line="1930" column="0" lean-forward="false" selection-start-line="1930" selection-start-column="0" selection-end-line="1930" selection-end-column="0" />
           <folding>
-            <element signature="e#0#12#0" expanded="true" />
+            <element signature="n#!!block;n#KeyName#0;n#!!block;n#Parameters#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#TerminationProtection#0;n#!!block;n#Parameters#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#PreferredPathTag#0;n#!!block;n#Parameters#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#SpokeTag#0;n#!!block;n#Parameters#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#SpokeTagValue#0;n#!!block;n#Parameters#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#RDTag#0;n#!!block;n#Parameters#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#BgpAsn#0;n#!!block;n#Parameters#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#VpcCidr#0;n#!!block;n#Parameters#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#PubSubnet1#0;n#!!block;n#Parameters#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#PubSubnet2#0;n#!!block;n#Parameters#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#CSRType#0;n#!!block;n#Parameters#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#LicenseModel#0;n#!!block;n#Parameters#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#S3Prefix#0;n#!!block;n#Parameters#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#DCXVLAN#0;n#!!block;n#Parameters#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#DCXASN#0;n#!!block;n#Parameters#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#DCXBGPAuthKey#0;n#!!block;n#Parameters#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#DCXAWSAddress#0;n#!!block;n#Parameters#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#DCXCustAddress#0;n#!!block;n#Parameters#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#DCXIPFamily#0;n#!!block;n#Parameters#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#SendAnonymousData#0;n#!!block;n#Parameters#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#AuthorizeAnotherAccount#0;n#!!block;n#Conditions#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#EnableTerm#0;n#!!block;n#Conditions#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#SendData#0;n#!!block;n#Conditions#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#AWS::CloudFormation::Interface#0;n#!!block;n#Metadata#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#Function#0;n#!!block;n#Mappings#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#Csr#0;n#!!block;n#Function#0;n#!!block;n#Mappings#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#CiscoCsrAMI#0;n#!!block;n#Mappings#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#CsrInstance#0;n#!!block;n#Mappings#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#RouteDomainList#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#VPNConfigS3Bucket#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#VPNConfigBucketPolicy#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#KMSKey#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#KMSKeyAlias#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#TransitVGW#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#TransitVPC#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#AttachVGWGateway#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#VPCPubSub1#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#VPCPubSub2#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#IGW#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#IGWToInternet#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#VPCRouteTable#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#VPCPublicRoute#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#S3Endpoint#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#DynamoDBEndpoint#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#VPCPubSubnetRouteTableAssociation1#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#VPCPubSubnetRouteTableAssociation2#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#VGWRoutePropagation#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#CsrEip1#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#CsrEip2#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#VpcCsr1#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#VpcCsr2#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#SolutionHelperRole#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#SolutionHelperRolePolicy#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#PolicyDocument#0;n#!!block;n#Properties#0;n#!!block;n#SolutionHelperRolePolicy#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#SolutionHelper#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#S3Bucket#0;n#!!block;n#Code#0;n#!!block;n#Properties#0;n#!!block;n#SolutionHelper#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#CreateRsaKey#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#CreateRandomPassword#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#CiscoConfigFunctionRole#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#CiscoConfigFunctionRolePolicy#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#ServiceToken#0;n#!!block;n#Properties#0;n#!!block;n#CiscoConfigFunct#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#LambdaCode#0;n#!!block;n#Properties#0;n#!!block;n#CiscoConfigFunct#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#LambdaCodeRegion#0;n#!!block;n#Properties#0;n#!!block;n#CiscoConfigFunct#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="e#41074#41397#0" expanded="false" />
+            <element signature="n#!!block;n#Runtime#0;n#!!block;n#Properties#0;n#!!block;n#CiscoConfigFunct#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#Description#0;n#!!block;n#Properties#0;n#!!block;n#CiscoConfigFunct#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#Timeout#0;n#!!block;n#Properties#0;n#!!block;n#CiscoConfigFunct#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#MemorySize#0;n#!!block;n#Properties#0;n#!!block;n#CiscoConfigFunct#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#VpcConfig#0;n#!!block;n#Properties#0;n#!!block;n#CiscoConfigFunct#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#S3Event#0;n#!!block;n#Properties#0;n#!!block;n#CiscoConfigFunct#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#TransitVpcPollerRole#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#TransitVpcPollerRolePolicy#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#PollerFunct#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#CloudWatchEvent#0;n#!!block;n#Properties#0;n#!!block;n#PollerFunct#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#DCXVif#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#DCXHelperFunction#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#FunctionName#0;n#!!block;n#Properties#0;n#!!block;n#DCXHelperFunction#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#DCXHelperRole#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#DCXHelperRolePolicy#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="e#56450#56703#0" expanded="false" />
+            <element signature="n#!!block;n#CSRSecurityGroup#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#CiscoConfigSecurityGroup#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#SSHtoCSR#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#CSR1RecoveryAlarm#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#CSR2RecoveryAlarm#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#CreateUniqueID#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#SendingData#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$USER_HOME$/Downloads/LambdaAMILookupSample.template">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-98">
-          <caret line="29" column="0" lean-forward="false" selection-start-line="29" selection-start-column="0" selection-end-line="29" selection-end-column="0" />
-          <folding>
-            <element signature="n#!!block;n#AWSInstanceType2Arch#0;n#!!block;n#Mappings#0;n#!!top" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/account-perm-update.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="885">
-          <caret line="59" column="29" lean-forward="false" selection-start-line="59" selection-start-column="29" selection-end-line="59" selection-end-column="29" />
-          <folding>
-            <element signature="e#0#12#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/dcx-helper/six.py">
+    <entry file="file://$USER_HOME$/Downloads/develepment2-SolutionHelper-F25O13IQXQ2Y-cac3865e-c37a-40b1-b832-0752b435ca45/solution-helper.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/dcx_helper/__init__.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
+          <folding>
+            <element signature="e#2130#4655#0" expanded="false" />
+            <element signature="e#4772#5674#0" expanded="false" />
+            <element signature="e#5719#9596#0" expanded="false" />
+            <element signature="e#9641#13043#0" expanded="false" />
+            <element signature="e#13073#13750#0" expanded="false" />
+            <element signature="e#13783#14514#0" expanded="false" />
+            <element signature="e#14546#14810#0" expanded="false" />
+            <element signature="e#14855#15406#0" expanded="false" />
+            <element signature="e#15442#15804#0" expanded="false" />
+            <element signature="e#15872#16675#0" expanded="false" />
+            <element signature="e#16704#16854#0" expanded="false" />
+            <element signature="e#16954#17544#0" expanded="false" />
+            <element signature="e#17591#27359#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -696,17 +691,20 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/dcx-helper/easy_install.py">
+    <entry file="file://$PROJECT_DIR$/dcx-helper/dcx-helper.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
+        <state relative-caret-position="225">
+          <caret line="20" column="0" lean-forward="false" selection-start-line="20" selection-start-column="0" selection-end-line="20" selection-end-column="0" />
+          <folding>
+            <element signature="e#1396#2426#0" expanded="false" />
+            <element signature="e#3999#4315#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$APPLICATION_CONFIG_DIR$/scratches/scratch_2.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="104">
+        <state relative-caret-position="105">
           <caret line="7" column="31" lean-forward="false" selection-start-line="7" selection-start-column="31" selection-end-line="7" selection-end-column="31" />
           <folding />
         </state>
@@ -722,23 +720,23 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/transit-vpc-push-cisco-config/transit-vpc-push-cisco-config.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-6417">
-          <caret line="19" column="11" lean-forward="true" selection-start-line="19" selection-start-column="11" selection-end-line="19" selection-end-column="11" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$APPLICATION_CONFIG_DIR$/scratches/scratch_4.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="45">
-          <caret line="3" column="36" lean-forward="true" selection-start-line="3" selection-start-column="36" selection-end-line="3" selection-end-column="36" />
-          <folding />
+        <state relative-caret-position="1410">
+          <caret line="339" column="0" lean-forward="false" selection-start-line="339" selection-start-column="0" selection-end-line="339" selection-end-column="0" />
+          <folding>
+            <element signature="e#1432#1444#0" expanded="true" />
+            <element signature="e#3002#3652#0" expanded="false" />
+            <element signature="e#4710#5543#0" expanded="false" />
+            <element signature="e#5641#6251#0" expanded="false" />
+            <element signature="e#7701#8065#0" expanded="false" />
+            <element signature="e#8196#19309#0" expanded="false" />
+            <element signature="e#19410#21273#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$APPLICATION_CONFIG_DIR$/scratches/scratch_3.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="351">
+        <state relative-caret-position="690">
           <caret line="54" column="40" lean-forward="false" selection-start-line="54" selection-start-column="40" selection-end-line="54" selection-end-column="40" />
           <folding>
             <element signature="e#2690#2986#0" expanded="false" />
@@ -746,10 +744,54 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$APPLICATION_CONFIG_DIR$/scratches/scratch_4.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="45">
+          <caret line="3" column="36" lean-forward="false" selection-start-line="3" selection-start-column="36" selection-end-line="3" selection-end-column="36" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/transit-vpc-primary-account-existing-vpc.template">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1635">
+          <caret line="201" column="30" lean-forward="false" selection-start-line="201" selection-start-column="30" selection-end-line="201" selection-end-column="30" />
+          <folding>
+            <element signature="n#!!block;n#Metadata#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#Mappings#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#VPNConfigBucketPolicy#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#KMSKey#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#KMSKeyAlias#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#S3Endpoint#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#CsrEip2#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#VpcCsr1#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#VpcCsr2#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#SolutionHelperRole#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#SolutionHelperRolePolicy#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#SolutionHelper#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#CreateRsaKey#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#CreateRandomPassword#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#CiscoConfigFunctionRole#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#CiscoConfigFunctionRolePolicy#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#CiscoConfigFunct#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#TransitVpcPollerRole#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#TransitVpcPollerRolePolicy#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#PollerFunct#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#CiscoConfigSecurityGroup#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#SSHtoCSR#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#CSR1RecoveryAlarm#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#CSR2RecoveryAlarm#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#CreateUniqueID#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#SendingData#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#Outputs#0;n#!!top" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/transit-vpc-primary-account.template">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="174">
-          <caret line="2207" column="42" lean-forward="true" selection-start-line="2207" selection-start-column="42" selection-end-line="2207" selection-end-column="42" />
+        <state relative-caret-position="3765">
+          <caret line="1930" column="0" lean-forward="false" selection-start-line="1930" selection-start-column="0" selection-end-line="1930" selection-end-column="0" />
           <folding>
             <element signature="n#!!block;n#KeyName#0;n#!!block;n#Parameters#0;n#!!top" expanded="false" />
             <element signature="n#!!block;n#TerminationProtection#0;n#!!block;n#Parameters#0;n#!!top" expanded="false" />
@@ -764,7 +806,6 @@
             <element signature="n#!!block;n#CSRType#0;n#!!block;n#Parameters#0;n#!!top" expanded="false" />
             <element signature="n#!!block;n#LicenseModel#0;n#!!block;n#Parameters#0;n#!!top" expanded="false" />
             <element signature="n#!!block;n#S3Prefix#0;n#!!block;n#Parameters#0;n#!!top" expanded="false" />
-            <element signature="n#!!block;n#AccountId#0;n#!!block;n#Parameters#0;n#!!top" expanded="false" />
             <element signature="n#!!block;n#DCXVLAN#0;n#!!block;n#Parameters#0;n#!!top" expanded="false" />
             <element signature="n#!!block;n#DCXASN#0;n#!!block;n#Parameters#0;n#!!top" expanded="false" />
             <element signature="n#!!block;n#DCXBGPAuthKey#0;n#!!block;n#Parameters#0;n#!!top" expanded="false" />
@@ -798,6 +839,7 @@
             <element signature="n#!!block;n#DynamoDBEndpoint#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
             <element signature="n#!!block;n#VPCPubSubnetRouteTableAssociation1#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
             <element signature="n#!!block;n#VPCPubSubnetRouteTableAssociation2#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#VGWRoutePropagation#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
             <element signature="n#!!block;n#CsrEip1#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
             <element signature="n#!!block;n#CsrEip2#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
             <element signature="n#!!block;n#VpcCsr1#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
@@ -805,12 +847,12 @@
             <element signature="n#!!block;n#SolutionHelperRole#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
             <element signature="n#!!block;n#SolutionHelperRolePolicy#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
             <element signature="n#!!block;n#PolicyDocument#0;n#!!block;n#Properties#0;n#!!block;n#SolutionHelperRolePolicy#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#SolutionHelper#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
             <element signature="n#!!block;n#S3Bucket#0;n#!!block;n#Code#0;n#!!block;n#Properties#0;n#!!block;n#SolutionHelper#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
             <element signature="n#!!block;n#CreateRsaKey#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
             <element signature="n#!!block;n#CreateRandomPassword#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
             <element signature="n#!!block;n#CiscoConfigFunctionRole#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
             <element signature="n#!!block;n#CiscoConfigFunctionRolePolicy#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
-            <element signature="n#!!block;n#CiscoConfigFunct#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
             <element signature="n#!!block;n#ServiceToken#0;n#!!block;n#Properties#0;n#!!block;n#CiscoConfigFunct#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
             <element signature="n#!!block;n#LambdaCode#0;n#!!block;n#Properties#0;n#!!block;n#CiscoConfigFunct#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
             <element signature="n#!!block;n#LambdaCodeRegion#0;n#!!block;n#Properties#0;n#!!block;n#CiscoConfigFunct#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
@@ -821,18 +863,168 @@
             <element signature="n#!!block;n#MemorySize#0;n#!!block;n#Properties#0;n#!!block;n#CiscoConfigFunct#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
             <element signature="n#!!block;n#VpcConfig#0;n#!!block;n#Properties#0;n#!!block;n#CiscoConfigFunct#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
             <element signature="n#!!block;n#S3Event#0;n#!!block;n#Properties#0;n#!!block;n#CiscoConfigFunct#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
-            <element signature="e#43606#47072#0" expanded="false" />
             <element signature="n#!!block;n#TransitVpcPollerRole#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
             <element signature="n#!!block;n#TransitVpcPollerRolePolicy#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
             <element signature="n#!!block;n#PollerFunct#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
             <element signature="n#!!block;n#CloudWatchEvent#0;n#!!block;n#Properties#0;n#!!block;n#PollerFunct#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
-            <element signature="n#!!block;n#FindReplace#0;n#!!block;n#Properties#0;n#!!block;n#PollerFunct#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
             <element signature="n#!!block;n#DCXVif#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
             <element signature="n#!!block;n#DCXHelperFunction#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
             <element signature="n#!!block;n#FunctionName#0;n#!!block;n#Properties#0;n#!!block;n#DCXHelperFunction#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
             <element signature="n#!!block;n#DCXHelperRole#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#DCXHelperRolePolicy#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
             <element signature="e#56450#56703#0" expanded="false" />
             <element signature="n#!!block;n#CSRSecurityGroup#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#CiscoConfigSecurityGroup#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#SSHtoCSR#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#CSR1RecoveryAlarm#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#CSR2RecoveryAlarm#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#CreateUniqueID#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#SendingData#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/Downloads/develepment2-SolutionHelper-F25O13IQXQ2Y-cac3865e-c37a-40b1-b832-0752b435ca45/solution-helper.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="e#2130#4655#0" expanded="false" />
+            <element signature="e#4772#5674#0" expanded="false" />
+            <element signature="e#5719#9596#0" expanded="false" />
+            <element signature="e#9641#13043#0" expanded="false" />
+            <element signature="e#13073#13750#0" expanded="false" />
+            <element signature="e#13783#14514#0" expanded="false" />
+            <element signature="e#14546#14810#0" expanded="false" />
+            <element signature="e#14855#15406#0" expanded="false" />
+            <element signature="e#15442#15804#0" expanded="false" />
+            <element signature="e#15872#16675#0" expanded="false" />
+            <element signature="e#16704#16854#0" expanded="false" />
+            <element signature="e#16954#17544#0" expanded="false" />
+            <element signature="e#17591#27359#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../D3 Infrastructure/CloudFormation/Cloud Formation/Network.template">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="330">
+          <caret line="496" column="1" lean-forward="false" selection-start-line="496" selection-start-column="1" selection-end-line="496" selection-end-column="1" />
+          <folding>
+            <element signature="e#377#2768#0" expanded="false" />
+            <element signature="e#2803#5353#0" expanded="false" />
+            <element signature="e#5382#6989#0" expanded="false" />
+            <element signature="e#7012#14522#0" expanded="false" />
+            <element signature="e#7311#7540#0" expanded="false" />
+            <element signature="e#7574#8203#0" expanded="false" />
+            <element signature="e#8223#8852#0" expanded="false" />
+            <element signature="e#8872#9509#0" expanded="false" />
+            <element signature="e#9534#9860#0" expanded="false" />
+            <element signature="e#9879#10093#0" expanded="false" />
+            <element signature="e#10119#10493#0" expanded="false" />
+            <element signature="e#10514#10802#0" expanded="false" />
+            <element signature="e#10846#11073#0" expanded="false" />
+            <element signature="e#11118#11345#0" expanded="false" />
+            <element signature="e#11390#11617#0" expanded="false" />
+            <element signature="e#11643#12017#0" expanded="false" />
+            <element signature="e#12059#12436#0" expanded="false" />
+            <element signature="e#12479#12858#0" expanded="false" />
+            <element signature="e#12905#13287#0" expanded="false" />
+            <element signature="e#13326#13704#0" expanded="false" />
+            <element signature="e#13748#13975#0" expanded="false" />
+            <element signature="e#14019#14246#0" expanded="false" />
+            <element signature="e#14290#14517#0" expanded="false" />
+            <element signature="e#14536#14783#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/dcx-helper/dcx-helper.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="225">
+          <caret line="20" column="0" lean-forward="false" selection-start-line="20" selection-start-column="0" selection-end-line="20" selection-end-column="0" />
+          <folding>
+            <element signature="e#1396#2426#0" expanded="false" />
+            <element signature="e#3999#4315#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$APPLICATION_CONFIG_DIR$/scratches/scratch_2.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="105">
+          <caret line="7" column="31" lean-forward="false" selection-start-line="7" selection-start-column="31" selection-end-line="7" selection-end-column="31" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/transit-vpc-poller.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/transit-vpc-push-cisco-config/transit-vpc-push-cisco-config.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1410">
+          <caret line="339" column="0" lean-forward="false" selection-start-line="339" selection-start-column="0" selection-end-line="339" selection-end-column="0" />
+          <folding>
+            <element signature="e#1432#1444#0" expanded="true" />
+            <element signature="e#3002#3652#0" expanded="false" />
+            <element signature="e#4710#5543#0" expanded="false" />
+            <element signature="e#5641#6251#0" expanded="false" />
+            <element signature="e#7701#8065#0" expanded="false" />
+            <element signature="e#8196#19309#0" expanded="false" />
+            <element signature="e#19410#21273#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$APPLICATION_CONFIG_DIR$/scratches/scratch_3.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="690">
+          <caret line="54" column="40" lean-forward="false" selection-start-line="54" selection-start-column="40" selection-end-line="54" selection-end-column="40" />
+          <folding>
+            <element signature="e#2690#2986#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$APPLICATION_CONFIG_DIR$/scratches/scratch_4.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="45">
+          <caret line="3" column="36" lean-forward="true" selection-start-line="3" selection-start-column="36" selection-end-line="3" selection-end-column="36" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/transit-vpc-primary-account-existing-vpc.template">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1635">
+          <caret line="201" column="30" lean-forward="false" selection-start-line="201" selection-start-column="30" selection-end-line="201" selection-end-column="30" />
+          <folding>
+            <element signature="n#!!block;n#Metadata#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#Mappings#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#VPNConfigBucketPolicy#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#KMSKey#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#KMSKeyAlias#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#S3Endpoint#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#CsrEip2#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#VpcCsr1#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#VpcCsr2#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#SolutionHelperRole#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#SolutionHelperRolePolicy#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#SolutionHelper#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#CreateRsaKey#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#CreateRandomPassword#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#CiscoConfigFunctionRole#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#CiscoConfigFunctionRolePolicy#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#CiscoConfigFunct#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#TransitVpcPollerRole#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#TransitVpcPollerRolePolicy#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#PollerFunct#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
             <element signature="n#!!block;n#CiscoConfigSecurityGroup#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
             <element signature="n#!!block;n#SSHtoCSR#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
             <element signature="n#!!block;n#CSR1RecoveryAlarm#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
@@ -844,14 +1036,309 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/account-perm-update.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/Downloads/LambdaAMILookupSample.template">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-98">
+          <caret line="29" column="0" lean-forward="false" selection-start-line="29" selection-start-column="0" selection-end-line="29" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/dcx-helper/six.py" />
+    <entry file="file://$PROJECT_DIR$/dcx_helper/__init__.py" />
+    <entry file="file://$PROJECT_DIR$/../D3 Infrastructure/CloudFormation/Cloud Formation/Network.template">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="330">
+          <caret line="496" column="1" lean-forward="false" selection-start-line="496" selection-start-column="1" selection-end-line="496" selection-end-column="1" />
+          <folding>
+            <element signature="e#377#2768#0" expanded="false" />
+            <element signature="e#2803#5353#0" expanded="false" />
+            <element signature="e#5382#6989#0" expanded="false" />
+            <element signature="e#7012#14522#0" expanded="false" />
+            <element signature="e#7311#7540#0" expanded="false" />
+            <element signature="e#7574#8203#0" expanded="false" />
+            <element signature="e#8223#8852#0" expanded="false" />
+            <element signature="e#8872#9509#0" expanded="false" />
+            <element signature="e#9534#9860#0" expanded="false" />
+            <element signature="e#9879#10093#0" expanded="false" />
+            <element signature="e#10119#10493#0" expanded="false" />
+            <element signature="e#10514#10802#0" expanded="false" />
+            <element signature="e#10846#11073#0" expanded="false" />
+            <element signature="e#11118#11345#0" expanded="false" />
+            <element signature="e#11390#11617#0" expanded="false" />
+            <element signature="e#11643#12017#0" expanded="false" />
+            <element signature="e#12059#12436#0" expanded="false" />
+            <element signature="e#12479#12858#0" expanded="false" />
+            <element signature="e#12905#13287#0" expanded="false" />
+            <element signature="e#13326#13704#0" expanded="false" />
+            <element signature="e#13748#13975#0" expanded="false" />
+            <element signature="e#14019#14246#0" expanded="false" />
+            <element signature="e#14290#14517#0" expanded="false" />
+            <element signature="e#14536#14783#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/dcx-helper/easy_install.py" />
+    <entry file="file://$APPLICATION_CONFIG_DIR$/scratches/scratch_4.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="45">
+          <caret line="3" column="36" lean-forward="false" selection-start-line="3" selection-start-column="36" selection-end-line="3" selection-end-column="36" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$APPLICATION_CONFIG_DIR$/scratches/scratch_3.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="690">
+          <caret line="54" column="40" lean-forward="false" selection-start-line="54" selection-start-column="40" selection-end-line="54" selection-end-column="40" />
+          <folding>
+            <element signature="e#2690#2986#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/transit-vpc-primary-account.template">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="3765">
+          <caret line="1930" column="0" lean-forward="false" selection-start-line="1930" selection-start-column="0" selection-end-line="1930" selection-end-column="0" />
+          <folding>
+            <element signature="n#!!block;n#KeyName#0;n#!!block;n#Parameters#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#TerminationProtection#0;n#!!block;n#Parameters#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#PreferredPathTag#0;n#!!block;n#Parameters#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#SpokeTag#0;n#!!block;n#Parameters#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#SpokeTagValue#0;n#!!block;n#Parameters#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#RDTag#0;n#!!block;n#Parameters#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#BgpAsn#0;n#!!block;n#Parameters#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#VpcCidr#0;n#!!block;n#Parameters#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#PubSubnet1#0;n#!!block;n#Parameters#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#PubSubnet2#0;n#!!block;n#Parameters#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#CSRType#0;n#!!block;n#Parameters#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#LicenseModel#0;n#!!block;n#Parameters#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#S3Prefix#0;n#!!block;n#Parameters#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#DCXVLAN#0;n#!!block;n#Parameters#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#DCXASN#0;n#!!block;n#Parameters#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#DCXBGPAuthKey#0;n#!!block;n#Parameters#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#DCXAWSAddress#0;n#!!block;n#Parameters#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#DCXCustAddress#0;n#!!block;n#Parameters#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#DCXIPFamily#0;n#!!block;n#Parameters#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#SendAnonymousData#0;n#!!block;n#Parameters#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#AuthorizeAnotherAccount#0;n#!!block;n#Conditions#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#EnableTerm#0;n#!!block;n#Conditions#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#SendData#0;n#!!block;n#Conditions#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#AWS::CloudFormation::Interface#0;n#!!block;n#Metadata#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#Function#0;n#!!block;n#Mappings#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#Csr#0;n#!!block;n#Function#0;n#!!block;n#Mappings#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#CiscoCsrAMI#0;n#!!block;n#Mappings#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#CsrInstance#0;n#!!block;n#Mappings#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#RouteDomainList#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#VPNConfigS3Bucket#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#VPNConfigBucketPolicy#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#KMSKey#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#KMSKeyAlias#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#TransitVGW#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#TransitVPC#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#AttachVGWGateway#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#VPCPubSub1#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#VPCPubSub2#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#IGW#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#IGWToInternet#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#VPCRouteTable#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#VPCPublicRoute#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#S3Endpoint#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#DynamoDBEndpoint#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#VPCPubSubnetRouteTableAssociation1#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#VPCPubSubnetRouteTableAssociation2#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#VGWRoutePropagation#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#CsrEip1#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#CsrEip2#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#VpcCsr1#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#VpcCsr2#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#SolutionHelperRole#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#SolutionHelperRolePolicy#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#PolicyDocument#0;n#!!block;n#Properties#0;n#!!block;n#SolutionHelperRolePolicy#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#SolutionHelper#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#S3Bucket#0;n#!!block;n#Code#0;n#!!block;n#Properties#0;n#!!block;n#SolutionHelper#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#CreateRsaKey#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#CreateRandomPassword#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#CiscoConfigFunctionRole#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#CiscoConfigFunctionRolePolicy#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#ServiceToken#0;n#!!block;n#Properties#0;n#!!block;n#CiscoConfigFunct#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#LambdaCode#0;n#!!block;n#Properties#0;n#!!block;n#CiscoConfigFunct#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#LambdaCodeRegion#0;n#!!block;n#Properties#0;n#!!block;n#CiscoConfigFunct#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="e#41074#41397#0" expanded="false" />
+            <element signature="n#!!block;n#Runtime#0;n#!!block;n#Properties#0;n#!!block;n#CiscoConfigFunct#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#Description#0;n#!!block;n#Properties#0;n#!!block;n#CiscoConfigFunct#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#Timeout#0;n#!!block;n#Properties#0;n#!!block;n#CiscoConfigFunct#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#MemorySize#0;n#!!block;n#Properties#0;n#!!block;n#CiscoConfigFunct#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#VpcConfig#0;n#!!block;n#Properties#0;n#!!block;n#CiscoConfigFunct#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#S3Event#0;n#!!block;n#Properties#0;n#!!block;n#CiscoConfigFunct#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#TransitVpcPollerRole#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#TransitVpcPollerRolePolicy#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#PollerFunct#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#CloudWatchEvent#0;n#!!block;n#Properties#0;n#!!block;n#PollerFunct#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#DCXVif#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#DCXHelperFunction#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#FunctionName#0;n#!!block;n#Properties#0;n#!!block;n#DCXHelperFunction#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#DCXHelperRole#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#DCXHelperRolePolicy#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="e#56450#56703#0" expanded="false" />
+            <element signature="n#!!block;n#CSRSecurityGroup#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#CiscoConfigSecurityGroup#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#SSHtoCSR#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#CSR1RecoveryAlarm#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#CSR2RecoveryAlarm#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#CreateUniqueID#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#SendingData#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/Downloads/develepment2-SolutionHelper-F25O13IQXQ2Y-cac3865e-c37a-40b1-b832-0752b435ca45/solution-helper.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="e#2130#4655#0" expanded="false" />
+            <element signature="e#4772#5674#0" expanded="false" />
+            <element signature="e#5719#9596#0" expanded="false" />
+            <element signature="e#9641#13043#0" expanded="false" />
+            <element signature="e#13073#13750#0" expanded="false" />
+            <element signature="e#13783#14514#0" expanded="false" />
+            <element signature="e#14546#14810#0" expanded="false" />
+            <element signature="e#14855#15406#0" expanded="false" />
+            <element signature="e#15442#15804#0" expanded="false" />
+            <element signature="e#15872#16675#0" expanded="false" />
+            <element signature="e#16704#16854#0" expanded="false" />
+            <element signature="e#16954#17544#0" expanded="false" />
+            <element signature="e#17591#27359#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/transit-vpc-primary-account-existing-vpc.template">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="188">
+          <caret line="201" column="30" lean-forward="false" selection-start-line="201" selection-start-column="30" selection-end-line="201" selection-end-column="30" />
+          <folding>
+            <element signature="n#!!block;n#Metadata#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#Mappings#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#VPNConfigBucketPolicy#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#KMSKey#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#KMSKeyAlias#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#S3Endpoint#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#CsrEip2#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#VpcCsr1#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#VpcCsr2#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#SolutionHelperRole#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#SolutionHelperRolePolicy#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#SolutionHelper#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#CreateRsaKey#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#CreateRandomPassword#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#CiscoConfigFunctionRole#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#CiscoConfigFunctionRolePolicy#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#CiscoConfigFunct#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#TransitVpcPollerRole#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#TransitVpcPollerRolePolicy#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#PollerFunct#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#CiscoConfigSecurityGroup#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#SSHtoCSR#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#CSR1RecoveryAlarm#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#CSR2RecoveryAlarm#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#CreateUniqueID#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#SendingData#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#Outputs#0;n#!!top" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/transit-vpc-push-cisco-config/transit-vpc-push-cisco-config.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="131">
+          <caret line="95" column="25" lean-forward="false" selection-start-line="95" selection-start-column="20" selection-end-line="95" selection-end-column="25" />
+          <folding>
+            <element signature="e#1432#1444#0" expanded="true" />
+            <element signature="e#3002#3652#0" expanded="false" />
+            <element signature="e#4710#5543#0" expanded="false" />
+            <element signature="e#5641#6251#0" expanded="false" />
+            <element signature="e#7701#8065#0" expanded="false" />
+            <element signature="e#8196#19309#0" expanded="false" />
+            <element signature="e#19410#21273#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$APPLICATION_CONFIG_DIR$/scratches/scratch_2.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="105">
+          <caret line="7" column="31" lean-forward="false" selection-start-line="7" selection-start-column="31" selection-end-line="7" selection-end-column="31" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/dcx-helper/dcx-helper.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-526">
-          <caret line="20" column="0" lean-forward="true" selection-start-line="20" selection-start-column="0" selection-end-line="20" selection-end-column="0" />
+        <state relative-caret-position="75">
+          <caret line="5" column="0" lean-forward="false" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="43" />
           <folding>
-            <element signature="e#0#11#0" expanded="true" />
             <element signature="e#1396#2426#0" expanded="false" />
             <element signature="e#3999#4315#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/testjson.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="15">
+          <caret line="1" column="0" lean-forward="true" selection-start-line="1" selection-start-column="0" selection-end-line="1" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/account-perm-update.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1350">
+          <caret line="102" column="18" lean-forward="false" selection-start-line="102" selection-start-column="18" selection-end-line="102" selection-end-column="18" />
+          <folding>
+            <element signature="e#0#12#0" expanded="true" />
+            <element signature="e#1712#1928#0" expanded="false" />
+            <element signature="e#2012#2391#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/transit-vpc-poller.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-2335">
+          <caret line="1" column="5" lean-forward="false" selection-start-line="1" selection-start-column="4" selection-end-line="1" selection-end-column="5" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/transit-vpc-second-account.template">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="231">
+          <caret line="42" column="0" lean-forward="false" selection-start-line="42" selection-start-column="0" selection-end-line="42" selection-end-column="0" />
+          <folding>
+            <element signature="n#!!block;n#Mappings#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#SolutionHelperRole#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+            <element signature="n#!!block;n#SolutionHelper#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/Downloads/aws-cross-account-manager-sub.template">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-423">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="n#!!block;n#Properties#0;n#!!block;n#InitSubAccountExecRole#0;n#!!block;n#Resources#0;n#!!top" expanded="false" />
           </folding>
         </state>
       </provider>
