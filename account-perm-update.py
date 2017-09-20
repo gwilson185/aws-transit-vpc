@@ -1,23 +1,42 @@
 import boto3
 import json
+import logging
+from datetime import datetime
+from dateutil.tz import tzutc
 from botocore.exceptions import ClientError
 
-s3bucket = 'qa2-vpnconfigs3bucket-18znizdedfl0n'
-s3prefix = 'vpnconfigs'
-kmskeyid = ''
-kmskeyname = ''
+log = logging.getLogger()
+log.setLevel(logging.DEBUG)
 
-boto3.setup_default_session(profile_name='edc-transit')
+#value added from Cloud Formation
+policyarn = '%POLICY_ARN%'
+policyarn = 'arn:aws:iam::228198000189:policy/TransitPollerXAccount'
 
-s3 = boto3.client('s3')
-#kms = boto3.client('kms')
 
-def bucket_policy_list(bucket_policy):
+#boto3.setup_default_session(profile_name='edc-transit')
+
+iam = boto3.client('iam')
+
+#Returns policy body for an inline policy in the role
+def get_managed_policy(policyarn):
+    try:
+        response = iam.get_policy(PolicyArn=policyarn)
+
+    except ClientError, err:
+        #log.error(err)
+        print err
+
+    policy = iam.get_policy_version(PolicyArn=response['Policy']['Arn'],VersionId=response['Policy']['DefaultVersionId'])
+    return json.dumps(policy['PolicyVersion']['Document'])
+
+
+def iam_policy_list(policy):
     policy_list = list()
-    policy = json.loads(bucket_policy['Policy'])
-    for item in range(1,len(policy['Statement'])):
-        policy_list.append(policy['Statement'][item]['Principal']['AWS'].split(':')[4])
+    policy = json.loads(policy)
+    for item in range(0,len(policy['Statement'])):
+        policy_list.append(policy['Statement'][item]['Resource'].split(':')[4])
     return policy_list
+
 
 def account_id_list():
     try:
@@ -51,53 +70,95 @@ def account_id_list():
 
     return account_list
 
-def remove_bucket_policy_element(bucket_policy,account_list):
+
+def remove_policy_element(policy,account_list):
 
     for acct in account_list:
-      for item in range(1, len(bucket_policy['Statement'])):
-        if acct in str(bucket_policy['Statement'][item]):
-          bucket_policy['Statement'].pop(item)
-    return bucket_policy
+      for item in range(0, len(policy['Statement'])):
+        if acct in str(policy['Statement'][item]):
+          policy['Statement'].pop(item)
+    return policy
 
-def add_bucket_policy_element(bucket_policy,account_list,s3bucket,s3prefix):
+
+def add_policy_element(policy,account_list):
 
     for acct in account_list:
-        bucket_policy['Statement'].append({u'Action': [u's3:GetObject', u's3:PutObject', u's3:PutObjectAcl'],
-                                    u'Resource': u'arn:aws:s3:::' + s3bucket + '/' + s3prefix + '/*',
-                                    u'Effect': u'Allow', u'Principal': {u'AWS': u'arn:aws:iam::' + acct + ':root'}})
-    return bucket_policy
+        policy['Statement'].append({u'Action': u'sts:AssumeRole',
+                                    u'Resource': u'arn:aws:iam::' + acct + ':role/TransitAccountPollerRole',
+                                    u'Effect': u'Allow'})
+    return policy
 
-def pushBucketPolicy(bucket_policy,s3bucket):
+
+def delete_old_policy_version(policyarn):
+    versions = iam.list_policy_versions(PolicyArn=policyarn)['Versions']
+    date = datetime.now(tzutc())
+    versionid = None
+
+    for ver in versions:
+        if ver['CreateDate'] <= date:
+            versionid = ver['VersionId']
+            date = ver['CreateDate']
+    print versionid, date
+
+
     try:
-        s3.put_bucket_policy(Bucket=s3bucket, Policy=bucket_policy)
+        iam.delete_policy_version(PolicyArn=policyarn,VersionId=versionid)
 
-    except ClientError as err:
-          print err.response['Error']['Message']
+    except ClientError, err:
+        print err.response['Error']['Message']
+        log.error('Error deleting policy version: %s Version ID: $s',policyarn.split('/')[1],versionid)
+        log.debug('Boto3 Exception attempting to delete policy version. %s %s',err.response['Error']['Code'],err.response['Error']['Message'])
+    else:
+        print 'deleted policy version'
+        log.info('Deleted policy version %s in Policy %s',versionid,policyarn.split('/')[1])
 
 
-bucket_policy = s3.get_bucket_policy(Bucket=s3bucket)
-#kms_policy = kms.get_key_policy(KeyId='',PolicyName='default')
+def pushIamPolicy(policyarn, policy):
+    for attempt in range(3):
+        try:
+            iam.create_policy_version(PolicyArn=policyarn, PolicyDocument=policy,SetAsDefault=True)
 
-policyUpdate = False
+        except ClientError as err:
+            if err.response['Error']['Code'] == 'LimitExceeded':
+                delete_old_policy_version(policyarn)
+            else:
+                log.debug('Boto3 Exception attempting to add policy version. %s %s',err.response['Error']['Code'],err.response['Error']['Message'])
+                continue
+        else:
+            log.info('Added new policy version Policy %s',policyarn.split('/')[1])
+            #print 'Added new policy version'
+            return
 
-currentBucketPolicyList = bucket_policy_list(bucket_policy)
-AccountList = account_id_list()
 
-AddAccounts = list(set(AccountList) - set(currentBucketPolicyList))
-RemoveAccounts = list(set(currentBucketPolicyList) - set(AccountList))
+def lambda_handler(event,context):
+    policyUpdate = False
 
-newBucketPolicy = json.loads(bucket_policy['Policy'])
+    #get managed policy details
+    iamPolicy = get_managed_policy(policyarn)
 
-if RemoveAccounts != []:
-  newBucketPolicy = remove_bucket_policy_element(newBucketPolicy,RemoveAccounts)
-  policyUpdate = True
+    #generate account list from current policy
+    currentPolicyList = iam_policy_list(iamPolicy)
 
-if AddAccounts != []:
-  newBucketPolicy = add_bucket_policy_element(newBucketPolicy,AddAccounts,s3bucket,s3prefix)
-  policyUpdate = True
+    #get full AWS Account list from master account
+    AccountList = account_id_list()
 
-if policyUpdate:
-    pushBucketPolicy(json.dumps(newBucketPolicy),s3bucket)
-    print json.dumps(newBucketPolicy)
+    #determines which accounts need to be added
+    AddAccounts = list(set(AccountList) - set(currentPolicyList))
 
-print policyUpdate
+    #determine which accounts need to deleted from the policy
+    RemoveAccounts = list(set(currentPolicyList) - set(AccountList))
+
+    newIamPolicy = json.loads(iamPolicy)
+
+    if RemoveAccounts != []:
+      newIamPolicy = remove_policy_element(newIamPolicy,RemoveAccounts)
+      policyUpdate = True
+
+    if AddAccounts != []:
+      newIamPolicy = add_policy_element(newIamPolicy,AddAccounts)
+      policyUpdate = True
+
+    if policyUpdate:
+        pushIamPolicy(policyarn,json.dumps(newIamPolicy))
+
+
