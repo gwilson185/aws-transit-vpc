@@ -26,8 +26,6 @@ log.setLevel(logging.DEBUG)
 
 bucket_name='%BUCKET_NAME%'
 bucket_prefix='%PREFIX%'
-bucket_name='qa2-vpnconfigs3bucket-18znizdedfl0n'
-bucket_prefix='vpnconfigs/'
 
 routedomain = dict()
 
@@ -131,7 +129,7 @@ def updateConfigXML(xml, config, vgwTags, account_id, csr_number,routedomain):
 
     # Domain ASN
     newXml = xmldoc.createElement("domain_asn")
-    newXml.appendChild(xmldoc.createTextNode(routedomain['vrf_asn']))  # get dynamodb asn
+    newXml.appendChild(xmldoc.createTextNode(routedomain['vrf_asn']))
     transitConfig.appendChild(newXml)
 
     # Add transit config to XML
@@ -194,14 +192,14 @@ def lambda_handler(event, context):
     for acct in accounts:
         acct_role = boto3.client('sts')
         try:
-            response = acct_role.assume_role(RoleArn="arn:aws:iam::" + acct + ":role/Transit_PollerRole",
+            response = acct_role.assume_role(RoleArn="arn:aws:iam::" + acct + ":role/TransitXAccountPollerRole",
                                 RoleSessionName="transit-poller_session",
                                 DurationSeconds=900)
             log.info("Assuming Transit_PollerRole in Account %s", acct)
         except ClientError, e:
             log.debug(str(e))
             log.info('Could not get access to Account %s',acct)
-            break
+            continue
 
         for region in regions['Regions']:
             # Get region name for the current region
@@ -324,7 +322,7 @@ def lambda_handler(event, context):
                             VpnConnectionIds=[vpn2['VpnConnection']['VpnConnectionId']])
                         vpn_config2 = vpn_config2['VpnConnections'][0]['CustomerGatewayConfiguration']
                         # Update VPN configuration XML with transit VPC specific configuration info for this connection
-                        vpn_config2 = updateConfigXML(vpn_config2, config, vgwTags, account_id, 'CSR2')
+                        vpn_config2 = updateConfigXML(vpn_config2, config, vgwTags, account_id, 'CSR2',routedomain)
                         # Put CSR2 config in S3
                         s3.put_object(
                             Body=str.encode(vpn_config2),
@@ -355,9 +353,11 @@ def lambda_handler(event, context):
                                 csrNum = '2'
                             # Need to get VPN configuration to remove from CSR
                             vpn_config = vpn['CustomerGatewayConfiguration']
+                            # set routedomain value; This value is not needed for the delete process but a properly formatted dict is expected by the updateConfigXml function
+                            routedomain = {'rd_name':'NONE','vrf_asn':'NONE'}
                             # Update VPN configuration XML with transit VPC specific configuration info for this connection
                             vpn_config = updateConfigXML(vpn_config, config, vgwTags, account_id,
-                                                         vpnTags['transitvpc:endpoint'])
+                                                         vpnTags['transitvpc:endpoint'],routedomain)
                             s3.put_object(
                                 Body=str.encode(vpn_config),
                                 Bucket=bucket_name,
