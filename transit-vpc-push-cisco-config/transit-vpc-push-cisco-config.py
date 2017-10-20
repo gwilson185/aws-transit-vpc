@@ -13,6 +13,7 @@
 
 import boto3
 from botocore.client import Config
+from botocore.exceptions import ClientError
 import paramiko
 import json
 from xml.dom import minidom
@@ -76,6 +77,7 @@ def getNextTunnelId(ssh):
         return 1
     return int(lastTunnelNum) + 1
 
+
 def getNextRouteId(ssh,bgp_asn):
     log.info('Start getNextRouteId')
     ssh.send('term len 0\n')
@@ -91,8 +93,9 @@ def getNextRouteId(ssh,bgp_asn):
     lastRouteNum = 0
     output = output.split('\n')
     #Removes StdIn line and the last line which is the command prompt
+    log.debug("Output with EOL removed: %s", output)
     output = output[1:-1]
-    log.info("%s", output)
+    log.debug("Output after [1:-1]: %s", output)
     #lines = [line.lstrip(':') for line in output]
     existingRD = [x.strip().split(':')[1] for x in output]
     log.debug("Routing IDs found %s",existingRD)
@@ -101,7 +104,7 @@ def getNextRouteId(ssh,bgp_asn):
         if int(rd) == lastRouteNum:
             lastRouteNum = lastRouteNum + 1
     log.info('New Route Domain ID is %s',lastRouteNum)
-    return lastRouteNum
+    return str(lastRouteNum)
 
 # Logic to figure out existing tunnel IDs
 def getExistingTunnelId(ssh,vpn_connection_id):
@@ -130,7 +133,8 @@ def getExistingTunnelId(ssh,vpn_connection_id):
 
 #Generic logic to push pre-generated Cisco config to the router
 def pushConfig(ssh,config):
-    #log.info("Starting to push config")
+    log.info("Starting to push config")
+    log.debug("%s",config)
     #ssh.send('term len 0\n')
     #prompt(ssh)
     ssh.send('config t\n')
@@ -189,7 +193,12 @@ def create_cisco_config(bucket_name, bucket_key, s3_url, bgp_asn, ssh):
     #Download the VPN configuration XML document
     s3=boto3.client('s3',endpoint_url=s3_url,
       config=Config(s3={'addressing_style': 'virtual'}, signature_version='s3v4'))
-    config=s3.get_object(Bucket=bucket_name,Key=bucket_key)
+
+    try: config=s3.get_object(Bucket=bucket_name,Key=bucket_key)
+
+    except ClientError as err:
+        log.error("Could not get VPN Config file: %s",err)
+        return
 
     xmldoc=minidom.parseString(config['Body'].read())
     #Extract transit_vpc_configuration values
@@ -207,17 +216,24 @@ def create_cisco_config(bucket_name, bucket_key, s3_url, bgp_asn, ssh):
     vpn_gateway_id=vpn_connection.getElementsByTagName("vpn_gateway_id")[0].firstChild.data
     vpn_connection_type=vpn_connection.getElementsByTagName("vpn_connection_type")[0].firstChild.data
 
+    #Establish values to update Routing Database
+    ddb_vpn_value = dict()
+    ddb_vpn_value['vpnconnectionid']= vpn_connection_id
+    ddb_vpn_value['routedomain'] = vpn_config.getElementsByTagName("route_domain")[0].firstChild.data
+
     #Determine the VPN tunnels to work with
     if vpn_status == 'create':    
       tunnelId=getNextTunnelId(ssh)
+      ddb_vpn_value['action'] = 'add'
     else:
       tunnelId=getExistingTunnelId(ssh,vpn_connection_id)
       if tunnelId == 0:
-        return
+        return None
       
     log.info("%s %s with tunnel #%s and #%s.",vpn_status, vpn_connection_id, tunnelId, tunnelId+1)
     # Create or delete the VRF for this connection
-    if vpn_status == 'delete':    
+    if vpn_status == 'delete':
+      ddb_vpn_value['action'] = 'delete'
       ipsec_tunnel = vpn_connection.getElementsByTagName("ipsec_tunnel")[0]
       customer_gateway=ipsec_tunnel.getElementsByTagName("customer_gateway")[0]
       customer_gateway_bgp_asn=customer_gateway.getElementsByTagName("bgp")[0].getElementsByTagName("asn")[0].firstChild.data
@@ -261,81 +277,82 @@ def create_cisco_config(bucket_name, bucket_key, s3_url, bgp_asn, ssh):
 
       # Create tunnel specific configuration
       for ipsec_tunnel in vpn_connection.getElementsByTagName("ipsec_tunnel"):
-        customer_gateway=ipsec_tunnel.getElementsByTagName("customer_gateway")[0]
-        customer_gateway_tunnel_outside_address=customer_gateway.getElementsByTagName("tunnel_outside_address")[0].getElementsByTagName("ip_address")[0].firstChild.data
-        customer_gateway_tunnel_inside_address_ip_address=customer_gateway.getElementsByTagName("tunnel_inside_address")[0].getElementsByTagName("ip_address")[0].firstChild.data
-        customer_gateway_tunnel_inside_address_network_mask=customer_gateway.getElementsByTagName("tunnel_inside_address")[0].getElementsByTagName("network_mask")[0].firstChild.data
-        customer_gateway_tunnel_inside_address_network_cidr=customer_gateway.getElementsByTagName("tunnel_inside_address")[0].getElementsByTagName("network_cidr")[0].firstChild.data
-        customer_gateway_bgp_asn=customer_gateway.getElementsByTagName("bgp")[0].getElementsByTagName("asn")[0].firstChild.data
-        customer_gateway_bgp_hold_time=customer_gateway.getElementsByTagName("bgp")[0].getElementsByTagName("hold_time")[0].firstChild.data
-        
-        vpn_gateway=ipsec_tunnel.getElementsByTagName("vpn_gateway")[0]
-        vpn_gateway_tunnel_outside_address=vpn_gateway.getElementsByTagName("tunnel_outside_address")[0].getElementsByTagName("ip_address")[0].firstChild.data
-        vpn_gateway_tunnel_inside_address_ip_address=vpn_gateway.getElementsByTagName("tunnel_inside_address")[0].getElementsByTagName("ip_address")[0].firstChild.data
-        vpn_gateway_tunnel_inside_address_network_mask=vpn_gateway.getElementsByTagName("tunnel_inside_address")[0].getElementsByTagName("network_mask")[0].firstChild.data
-        vpn_gateway_tunnel_inside_address_network_cidr=vpn_gateway.getElementsByTagName("tunnel_inside_address")[0].getElementsByTagName("network_cidr")[0].firstChild.data
-        vpn_gateway_bgp_asn=vpn_gateway.getElementsByTagName("bgp")[0].getElementsByTagName("asn")[0].firstChild.data
-        vpn_gateway_bgp_hold_time=vpn_gateway.getElementsByTagName("bgp")[0].getElementsByTagName("hold_time")[0].firstChild.data
-        
-        ike=ipsec_tunnel.getElementsByTagName("ike")[0]
-        ike_authentication_protocol=ike.getElementsByTagName("authentication_protocol")[0].firstChild.data
-        ike_encryption_protocol=ike.getElementsByTagName("encryption_protocol")[0].firstChild.data
-        ike_lifetime=ike.getElementsByTagName("lifetime")[0].firstChild.data
-        ike_perfect_forward_secrecy=ike.getElementsByTagName("perfect_forward_secrecy")[0].firstChild.data
-        ike_mode=ike.getElementsByTagName("mode")[0].firstChild.data
-        ike_pre_shared_key=ike.getElementsByTagName("pre_shared_key")[0].firstChild.data
-        
-        ipsec=ipsec_tunnel.getElementsByTagName("ipsec")[0]
-        ipsec_protocol=ipsec.getElementsByTagName("protocol")[0].firstChild.data
-        ipsec_authentication_protocol=ipsec.getElementsByTagName("authentication_protocol")[0].firstChild.data
-        ipsec_encryption_protocol=ipsec.getElementsByTagName("encryption_protocol")[0].firstChild.data
-        ipsec_lifetime=ipsec.getElementsByTagName("lifetime")[0].firstChild.data
-        ipsec_perfect_forward_secrecy=ipsec.getElementsByTagName("perfect_forward_secrecy")[0].firstChild.data
-        ipsec_mode=ipsec.getElementsByTagName("mode")[0].firstChild.data
-        ipsec_clear_df_bit=ipsec.getElementsByTagName("clear_df_bit")[0].firstChild.data
-        ipsec_fragmentation_before_encryption=ipsec.getElementsByTagName("fragmentation_before_encryption")[0].firstChild.data
-        ipsec_tcp_mss_adjustment=ipsec.getElementsByTagName("tcp_mss_adjustment")[0].firstChild.data
-        ipsec_dead_peer_detection_interval=ipsec.getElementsByTagName("dead_peer_detection")[0].getElementsByTagName("interval")[0].firstChild.data
-        ipsec_dead_peer_detection_retries=ipsec.getElementsByTagName("dead_peer_detection")[0].getElementsByTagName("retries")[0].firstChild.data
+            customer_gateway=ipsec_tunnel.getElementsByTagName("customer_gateway")[0]
+            customer_gateway_tunnel_outside_address=customer_gateway.getElementsByTagName("tunnel_outside_address")[0].getElementsByTagName("ip_address")[0].firstChild.data
+            customer_gateway_tunnel_inside_address_ip_address=customer_gateway.getElementsByTagName("tunnel_inside_address")[0].getElementsByTagName("ip_address")[0].firstChild.data
+            customer_gateway_tunnel_inside_address_network_mask=customer_gateway.getElementsByTagName("tunnel_inside_address")[0].getElementsByTagName("network_mask")[0].firstChild.data
+            customer_gateway_tunnel_inside_address_network_cidr=customer_gateway.getElementsByTagName("tunnel_inside_address")[0].getElementsByTagName("network_cidr")[0].firstChild.data
+            customer_gateway_bgp_asn=customer_gateway.getElementsByTagName("bgp")[0].getElementsByTagName("asn")[0].firstChild.data
+            customer_gateway_bgp_hold_time=customer_gateway.getElementsByTagName("bgp")[0].getElementsByTagName("hold_time")[0].firstChild.data
 
-        config_text.append('crypto keyring keyring-{}-{}'.format(vpn_connection_id,tunnelId))
-        config_text.append('  local-address GigabitEthernet1')
-        config_text.append('  pre-shared-key address {} key {}'.format(vpn_gateway_tunnel_outside_address, ike_pre_shared_key))
-        config_text.append('exit')
-        config_text.append('crypto isakmp profile isakmp-{}-{}'.format(vpn_connection_id,tunnelId))
-        config_text.append('  local-address GigabitEthernet1')
-        config_text.append('  match identity address {}'.format(vpn_gateway_tunnel_outside_address))
-        config_text.append('  keyring keyring-{}-{}'.format(vpn_connection_id,tunnelId))
-        config_text.append('exit')
-        config_text.append('interface Tunnel{}'.format(tunnelId))
-	config_text.append('  description {} from {} to {} for account {}'.format(vpn_connection_id, vpn_gateway_id, customer_gateway_id, account_id))
-        config_text.append('  ip vrf forwarding {}'.format(vpn_connection_id))
-        config_text.append('  ip address {} 255.255.255.252'.format(customer_gateway_tunnel_inside_address_ip_address))
-        config_text.append('  ip virtual-reassembly')
-        config_text.append('  tunnel source GigabitEthernet1')
-        config_text.append('  tunnel destination {} '.format(vpn_gateway_tunnel_outside_address))
-        config_text.append('  tunnel mode ipsec ipv4')
-        config_text.append('  tunnel protection ipsec profile ipsec-vpn-aws')
-        config_text.append('  ip tcp adjust-mss 1387')
-        config_text.append('  no shutdown')
-        config_text.append('exit')
-        config_text.append('router bgp {}'.format(customer_gateway_bgp_asn))
-        config_text.append('  address-family ipv4 vrf {}'.format(vpn_connection_id))
-        config_text.append('  neighbor {} remote-as {}'.format(vpn_gateway_tunnel_inside_address_ip_address, vpn_gateway_bgp_asn))
-        if preferred_path != 'none':
-          config_text.append('  neighbor {} route-map rm-{} out'.format(vpn_gateway_tunnel_inside_address_ip_address, vpn_connection_id))
-        config_text.append('  neighbor {} timers 10 30 30'.format(vpn_gateway_tunnel_inside_address_ip_address))
-        config_text.append('  neighbor {} activate'.format(vpn_gateway_tunnel_inside_address_ip_address))
-        config_text.append('  neighbor {} as-override'.format(vpn_gateway_tunnel_inside_address_ip_address))
-        config_text.append('  neighbor {} soft-reconfiguration inbound'.format(vpn_gateway_tunnel_inside_address_ip_address))
-        config_text.append('exit')
-        config_text.append('exit')
-         
-        #Increment tunnel ID for going onto the next tunnel
-        tunnelId+=1
+            vpn_gateway=ipsec_tunnel.getElementsByTagName("vpn_gateway")[0]
+            vpn_gateway_tunnel_outside_address=vpn_gateway.getElementsByTagName("tunnel_outside_address")[0].getElementsByTagName("ip_address")[0].firstChild.data
+            vpn_gateway_tunnel_inside_address_ip_address=vpn_gateway.getElementsByTagName("tunnel_inside_address")[0].getElementsByTagName("ip_address")[0].firstChild.data
+            vpn_gateway_tunnel_inside_address_network_mask=vpn_gateway.getElementsByTagName("tunnel_inside_address")[0].getElementsByTagName("network_mask")[0].firstChild.data
+            vpn_gateway_tunnel_inside_address_network_cidr=vpn_gateway.getElementsByTagName("tunnel_inside_address")[0].getElementsByTagName("network_cidr")[0].firstChild.data
+            vpn_gateway_bgp_asn=vpn_gateway.getElementsByTagName("bgp")[0].getElementsByTagName("asn")[0].firstChild.data
+            vpn_gateway_bgp_hold_time=vpn_gateway.getElementsByTagName("bgp")[0].getElementsByTagName("hold_time")[0].firstChild.data
+
+            ike=ipsec_tunnel.getElementsByTagName("ike")[0]
+            ike_authentication_protocol=ike.getElementsByTagName("authentication_protocol")[0].firstChild.data
+            ike_encryption_protocol=ike.getElementsByTagName("encryption_protocol")[0].firstChild.data
+            ike_lifetime=ike.getElementsByTagName("lifetime")[0].firstChild.data
+            ike_perfect_forward_secrecy=ike.getElementsByTagName("perfect_forward_secrecy")[0].firstChild.data
+            ike_mode=ike.getElementsByTagName("mode")[0].firstChild.data
+            ike_pre_shared_key=ike.getElementsByTagName("pre_shared_key")[0].firstChild.data
+
+            ipsec=ipsec_tunnel.getElementsByTagName("ipsec")[0]
+            ipsec_protocol=ipsec.getElementsByTagName("protocol")[0].firstChild.data
+            ipsec_authentication_protocol=ipsec.getElementsByTagName("authentication_protocol")[0].firstChild.data
+            ipsec_encryption_protocol=ipsec.getElementsByTagName("encryption_protocol")[0].firstChild.data
+            ipsec_lifetime=ipsec.getElementsByTagName("lifetime")[0].firstChild.data
+            ipsec_perfect_forward_secrecy=ipsec.getElementsByTagName("perfect_forward_secrecy")[0].firstChild.data
+            ipsec_mode=ipsec.getElementsByTagName("mode")[0].firstChild.data
+            ipsec_clear_df_bit=ipsec.getElementsByTagName("clear_df_bit")[0].firstChild.data
+            ipsec_fragmentation_before_encryption=ipsec.getElementsByTagName("fragmentation_before_encryption")[0].firstChild.data
+            ipsec_tcp_mss_adjustment=ipsec.getElementsByTagName("tcp_mss_adjustment")[0].firstChild.data
+            ipsec_dead_peer_detection_interval=ipsec.getElementsByTagName("dead_peer_detection")[0].getElementsByTagName("interval")[0].firstChild.data
+            ipsec_dead_peer_detection_retries=ipsec.getElementsByTagName("dead_peer_detection")[0].getElementsByTagName("retries")[0].firstChild.data
+
+            config_text.append('crypto keyring keyring-{}-{}'.format(vpn_connection_id,tunnelId))
+            config_text.append('  local-address GigabitEthernet1')
+            config_text.append('  pre-shared-key address {} key {}'.format(vpn_gateway_tunnel_outside_address, ike_pre_shared_key))
+            config_text.append('exit')
+            config_text.append('crypto isakmp profile isakmp-{}-{}'.format(vpn_connection_id,tunnelId))
+            config_text.append('  local-address GigabitEthernet1')
+            config_text.append('  match identity address {}'.format(vpn_gateway_tunnel_outside_address))
+            config_text.append('  keyring keyring-{}-{}'.format(vpn_connection_id,tunnelId))
+            config_text.append('exit')
+            config_text.append('interface Tunnel{}'.format(tunnelId))
+            config_text.append('  description {} from {} to {} for account {}'.format(vpn_connection_id, vpn_gateway_id, customer_gateway_id, account_id))
+            config_text.append('  ip vrf forwarding {}'.format(vpn_connection_id))
+            config_text.append('  ip address {} 255.255.255.252'.format(customer_gateway_tunnel_inside_address_ip_address))
+            config_text.append('  ip virtual-reassembly')
+            config_text.append('  tunnel source GigabitEthernet1')
+            config_text.append('  tunnel destination {} '.format(vpn_gateway_tunnel_outside_address))
+            config_text.append('  tunnel mode ipsec ipv4')
+            config_text.append('  tunnel protection ipsec profile ipsec-vpn-aws')
+            config_text.append('  ip tcp adjust-mss 1387')
+            config_text.append('  no shutdown')
+            config_text.append('exit')
+            config_text.append('router bgp {}'.format(customer_gateway_bgp_asn))
+            config_text.append('  address-family ipv4 vrf {}'.format(vpn_connection_id))
+            config_text.append('  neighbor {} remote-as {}'.format(vpn_gateway_tunnel_inside_address_ip_address, vpn_gateway_bgp_asn))
+            if preferred_path != 'none':
+              config_text.append('  neighbor {} route-map rm-{} out'.format(vpn_gateway_tunnel_inside_address_ip_address, vpn_connection_id))
+            config_text.append('  neighbor {} timers 10 30 30'.format(vpn_gateway_tunnel_inside_address_ip_address))
+            config_text.append('  neighbor {} activate'.format(vpn_gateway_tunnel_inside_address_ip_address))
+            config_text.append('  neighbor {} as-override'.format(vpn_gateway_tunnel_inside_address_ip_address))
+            config_text.append('  neighbor {} soft-reconfiguration inbound'.format(vpn_gateway_tunnel_inside_address_ip_address))
+            config_text.append('exit')
+            config_text.append('exit')
+
+            #Increment tunnel ID for going onto the next tunnel
+            tunnelId+=1
         
     log.debug("Conversion complete")
-    return config_text
+    return config_text,ddb_vpn_value
+
 
 def create_route_config(bucket_name,bucket_prefix, bucket_key, s3_url, config, ssh, csr_name):
     #Connect to DynamoDB
@@ -350,7 +367,7 @@ def create_route_config(bucket_name,bucket_prefix, bucket_key, s3_url, config, s
         for x in range(0, int(json.dumps(rd['Count']))):
             d = json.loads(json.dumps(rd['Items'][x]))
             log.info('Getting New Route ID')
-            nextRouteID = str(config['BGP_ASN']) + ':' + str(getNextRouteId(ssh,config['BGP_ASN']))
+            nextRouteID = str(config['BGP_ASN']) + ':' + getNextRouteId(ssh,config['BGP_ASN'])
             log.info('Updating DynamoDb with new ASN')
             update = rdomain_table.update_item(Key={'rd_name': d['rd_name']}, UpdateExpression="set vrf_asn = :asn",
                                                ExpressionAttributeValues={':asn': nextRouteID}, ReturnValues="UPDATED_NEW")
@@ -359,6 +376,8 @@ def create_route_config(bucket_name,bucket_prefix, bucket_key, s3_url, config, s
                 log.info('Successfully updated DynamoDB Table %s Route Domain %s with BGP ASN Domain ID %s',config['RD_LIST'],d['rd_name'],update['Attributes']['vrf_asn'])
                 route_config=['ip vrf {}'.format(d['rd_name'])]
                 route_config.append('rd {}'.format(nextRouteID))
+                route_config.append('route-target import {}'.format(nextRouteID))
+                route_config.append('route-target export {}'.format(nextRouteID))
                 route_config.append('exit')
 
                 s3.delete_object(Bucket=bucket_name,Key=bucket_key)
@@ -367,11 +386,24 @@ def create_route_config(bucket_name,bucket_prefix, bucket_key, s3_url, config, s
                 log.error('Error updating DynamoDB Table %s Route Domain %s with BGP ASN Domain ID %s',config['RD_LIST'],d['rd_name'],update['Attributes']['vrf_asn'])
                 return ''
 
+
 def get_route_config(bucket_name,bucket_key,s3_url):
     s3 = boto3.client('s3', endpoint_url=s3_url,
                       config=Config(s3={'addressing_style': 'virtual'}, signature_version='s3v4'))
     config = s3.get_object(Bucket=bucket_name,Key=bucket_key)
     return(config['Body'].read)
+
+
+def updateVPNDatabase(action,table,vpnconnectionid,csrname,routedomain):
+    rdomain_db = boto3.resource('dynamodb')
+    rdomain_table = rdomain_db.Table(table)
+
+    try: rdomain_table.update_item(Key={'rd_name': routedomain}, UpdateExpression=action + "#asc :vpn",
+                                       ExpressionAttributeNames={'#asc': csrname + '_Associated_VPNs'},
+                                       ExpressionAttributeValues={':vpn': set([vpnconnectionid])}, ReturnValues="UPDATED_NEW")
+    except ClientError as err:
+        print err
+
 
 def lambda_handler(event, context):
     record=event['Records'][0]
@@ -403,7 +435,7 @@ def lambda_handler(event, context):
     c.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     if 'newroute' in bucket_key:
         stime = time.time()
-        log.info('Pushing Route config to router %s.',csr_name)
+        log.info('Pushing Route config to router %s.', csr_name)
         try:
             c.connect(hostname=csr_ip, username=config['USER_NAME'], pkey=k)
             PubKeyAuth = True
@@ -456,13 +488,14 @@ def lambda_handler(event, context):
         stime = time.time()
         csr_config = create_cisco_config(bucket_name, bucket_key, endpoint_url[bucket_region], config['BGP_ASN'], ssh)
         log.info("--- %s seconds ---", (time.time() - stime))
-        log.info("Pushing config to router.")
-        stime = time.time()
-        pushConfig(ssh,csr_config)
-        log.info("--- %s seconds ---", (time.time() - stime))
-        ssh.close()
+        if csr_config != None:
+            log.info("Pushing config to router.")
+            stime = time.time()
+            pushConfig(ssh,csr_config[0])
+            updateVPNDatabase(csr_config[1]['action'],config['RD_LIST'],csr_config[1]['vpnconnectionid'],csr_name,csr_config[1]['routedomain'])
+            log.info("--- %s seconds ---", (time.time() - stime))
+            ssh.close()
+        else:
+            log.error("There is not a valid configuration to push to the router!")
 
     return
-    {
-        'message' : "Script execution completed. See Cloudwatch logs for complete output"
-    }

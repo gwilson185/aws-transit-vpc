@@ -27,7 +27,6 @@ log.setLevel(logging.DEBUG)
 bucket_name='%BUCKET_NAME%'
 bucket_prefix='%PREFIX%'
 
-routedomain = dict()
 
 def account_id_list():
     try:
@@ -76,9 +75,8 @@ def rdcheck(bucket_name, bucket_prefix, config, rdtag, rdtable):
         if 'vrf_asn' in json.dumps(rd['Items']):
             d = json.loads(json.dumps(rd['Items'][0]))
             log.info('Routing Domain %s is assigned ASN %s', d['rd_name'], d['vrf_asn'])
-            global routedomain
-            routedomain = d
-            return 'CONFIGURED'
+
+            return {'Value':'CONFIGURED','rd':{'rd_name':d['rd_name'],'vrf_asn':d['vrf_asn']}}
         else:
             s3.put_object(
                 Body="New Route Temp File",
@@ -88,10 +86,10 @@ def rdcheck(bucket_name, bucket_prefix, config, rdtag, rdtable):
                 ServerSideEncryption='aws:kms',
                 SSEKMSKeyId=config['KMS_KEY']
             )
-            return 'NOT_CONFIGURED'
+            return {'Value':'NOT_CONFIGURED'}
     else:
         log.error('Route Tag %s not in Database!', rdtag)
-        return 'NOT_CONFIGURED'
+        return {'Value':'NOT_CONFIGURED'}
 
 
 # This function adds a <transit_vpc_config /> block to an existing XML doc and returns the new XML
@@ -263,9 +261,9 @@ def lambda_handler(event, context):
 
                     routecheck = rdcheck(bucket_name, bucket_prefix, config, vgwTags[config['RD_TAG']], rdomain_table)
                     log.info('Route Check %s', routecheck)
-                    if routecheck == 'NOT_CONFIGURED':
+                    if routecheck['Value'] == 'NOT_CONFIGURED':
                         break
-                    elif routecheck == 'CONFIGURED':
+                    elif routecheck['Value'] == 'CONFIGURED':
                         log.info('VGW (%s) has a Routing Domain tag set', vgw['VpnGatewayId'])
                         # Create Customer Gateways (will create CGWs if they do not exist, otherwise, the API calls are ignored)
                         log.debug('Creating Customer Gateways with IP %s, %s', config['EIP1'], config['EIP2'])
@@ -307,7 +305,7 @@ def lambda_handler(event, context):
                             VpnConnectionIds=[vpn1['VpnConnection']['VpnConnectionId']])
                         vpn_config1 = vpn_config1['VpnConnections'][0]['CustomerGatewayConfiguration']
                         # Update VPN configuration XML with transit VPC specific configuration info for this connection
-                        vpn_config1 = updateConfigXML(vpn_config1, config, vgwTags, account_id, 'CSR1',routedomain)
+                        vpn_config1 = updateConfigXML(vpn_config1, config, vgwTags, account_id, 'CSR1',routecheck['rd'])
                         # Put CSR1 config in S3
                         s3.put_object(
                             Body=str.encode(vpn_config1),
@@ -322,7 +320,7 @@ def lambda_handler(event, context):
                             VpnConnectionIds=[vpn2['VpnConnection']['VpnConnectionId']])
                         vpn_config2 = vpn_config2['VpnConnections'][0]['CustomerGatewayConfiguration']
                         # Update VPN configuration XML with transit VPC specific configuration info for this connection
-                        vpn_config2 = updateConfigXML(vpn_config2, config, vgwTags, account_id, 'CSR2',routedomain)
+                        vpn_config2 = updateConfigXML(vpn_config2, config, vgwTags, account_id, 'CSR2',routecheck['rd'])
                         # Put CSR2 config in S3
                         s3.put_object(
                             Body=str.encode(vpn_config2),
@@ -354,7 +352,7 @@ def lambda_handler(event, context):
                             # Need to get VPN configuration to remove from CSR
                             vpn_config = vpn['CustomerGatewayConfiguration']
                             # set routedomain value; This value is not needed for the delete process but a properly formatted dict is expected by the updateConfigXml function
-                            routedomain = {'rd_name':'NONE','vrf_asn':'NONE'}
+                            routedomain = {'rd_name':vgwTags[config['RD_TAG']],'vrf_asn':'NONE'}
                             # Update VPN configuration XML with transit VPC specific configuration info for this connection
                             vpn_config = updateConfigXML(vpn_config, config, vgwTags, account_id,
                                                          vpnTags['transitvpc:endpoint'],routedomain)
