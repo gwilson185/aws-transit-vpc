@@ -27,6 +27,11 @@ log = logging.getLogger()
 log.setLevel(logging.DEBUG)
 
 config_file='transit_vpc_config.txt'
+
+#Entrust VPN termination IPs; used to determine if summary routes should be added
+EDC_DCX_ENDPOINT = '10.0.252.18'
+EDC_PUBLIC_ENDPOINT = '204.124.81.200'
+
 #These S3 endpoint URLs are provided to support VPC endpoints for S3 in regions such as Frankfort that require explicit region endpoint definition
 endpoint_url = {
   "us-east-1" : "https://s3.amazonaws.com",
@@ -186,6 +191,24 @@ def downloadPrivateKey(bucket_name, bucket_prefix, s3_url, prikey):
     log.info("Downloading private key: %s/%s/%s%s",s3_url, bucket_name, bucket_prefix, prikey)
     s3.download_file(bucket_name,bucket_prefix+prikey, '/tmp/'+prikey)
 
+def create_peer_config(bucket_name,bucket_key,s3_url):
+    log.info("Creating Peering Config...")
+    log.info("Processing %s/%s", bucket_name, bucket_key)
+
+    # Download the VPN configuration XML document
+    s3 = boto3.client('s3', endpoint_url=s3_url,config=Config(s3={'addressing_style': 'virtual'}, signature_version='s3v4'))
+
+    try:
+        config = s3.get_object(Bucket=bucket_name, Key=bucket_key)
+
+    except ClientError as err:
+        log.error("Could not get VPN Config file: %s", err)
+        return None
+
+    log.debug("%s",config['Body'].read)
+    return (config['Body'].read)
+
+
 #Logic to create the appropriate Cisco configuration
 def create_cisco_config(bucket_name, bucket_key, s3_url, bgp_asn, ssh):
     log.info("Processing %s/%s", bucket_name, bucket_key)
@@ -337,6 +360,12 @@ def create_cisco_config(bucket_name, bucket_key, s3_url, bgp_asn, ssh):
             config_text.append('exit')
             config_text.append('router bgp {}'.format(customer_gateway_bgp_asn))
             config_text.append('  address-family ipv4 vrf {}'.format(vpn_connection_id))
+            #Check for Entrust VPN Ip addresses. If not, we assume AWS and add summary routes
+            if customer_gateway_tunnel_outside_address not in (EDC_DCX_ENDPOINT,EDC_PUBLIC_ENDPOINT):
+                config_text.append('  aggregate-address 10.0.0.0 255.0.0.0 as-set summary-only')
+                config_text.append('  aggregate-address 172.16.0.0 255.240.0.0 as-set summary-only')
+                config_text.append('  aggregate-address 192.168.0.0 255.255.0.0 as-set summary-only')
+
             config_text.append('  neighbor {} remote-as {}'.format(vpn_gateway_tunnel_inside_address_ip_address, vpn_gateway_bgp_asn))
             if preferred_path != 'none':
               config_text.append('  neighbor {} route-map rm-{} out'.format(vpn_gateway_tunnel_inside_address_ip_address, vpn_connection_id))
@@ -486,13 +515,16 @@ def lambda_handler(event, context):
         log.debug("%s",prompt(ssh))
         log.debug("Creating config.")
         stime = time.time()
-        csr_config = create_cisco_config(bucket_name, bucket_key, endpoint_url[bucket_region], config['BGP_ASN'], ssh)
+        if 'peer' in bucket_key:
+            csr_config = create_peer_config(bucket_name, bucket_key,endpoint_url[bucket_region])
+        else:
+            csr_config = create_cisco_config(bucket_name, bucket_key,endpoint_url[bucket_region], config['BGP_ASN'], ssh)
+            updateVPNDatabase(csr_config[1]['action'], config['RD_LIST'], csr_config[1]['vpnconnectionid'], csr_name, csr_config[1]['routedomain'])
         log.info("--- %s seconds ---", (time.time() - stime))
         if csr_config != None:
             log.info("Pushing config to router.")
             stime = time.time()
             pushConfig(ssh,csr_config[0])
-            updateVPNDatabase(csr_config[1]['action'],config['RD_LIST'],csr_config[1]['vpnconnectionid'],csr_name,csr_config[1]['routedomain'])
             log.info("--- %s seconds ---", (time.time() - stime))
             ssh.close()
         else:

@@ -46,6 +46,16 @@
       "Type": "String",
       "Default": "100.64.127.224/27"
     },
+    "HostNameCsr1": {
+      "Description": "Hostname for CSR1; Will be added to transit.entrustdatacard.cloud domain",
+      "Type": "String",
+      "Default": "csr1"
+    },
+    "HostNameCsr2": {
+      "Description": "Hostname for CSR1; Will be added to transit.entrustdatacard.cloud domain",
+      "Type": "String",
+      "Default": "csr2"
+    },
     "PubSubnet1": {
       "Description": "Address range for Transit VPC subnet to be created in AZ1.",
       "Type": "String",
@@ -89,7 +99,7 @@
     "DCXVLAN": {
       "Description": "Direct Connect Virtual Interface VLAN",
       "Type": "String",
-      "Default": "350"
+      "Default": "3809"
     },
     "DCXASN": {
       "Description": "Direct Connect Virtual Interface BGP ASN",
@@ -167,7 +177,9 @@
             "CSRType",
             "KeyName",
             "LicenseModel",
-            "TerminationProtection"
+            "TerminationProtection",
+            "HostNameCsr1",
+            "HostNameCsr2"
           ]
         },
         {
@@ -221,6 +233,12 @@
         },
         "VpcCidr": {
           "default": "Transit VPC CIDR Block"
+        },
+        "HostNameCsr1": {
+          "default": "Csr1 Hostname"
+        },
+         "HostNameCsr2": {
+          "default": "Csr2 Hostname"
         },
         "PubSubnet1": {
           "default": "1st Subnet Network"
@@ -286,6 +304,15 @@
         "Timeout": "300",
         "MemorySize": "128"
       },
+      "AccountUpdate": {
+        "CodeLocation": "edc-lambdacode/account-perm-update.py",
+        "CodeRegion": "us-east-1",
+        "Name": "AccountPolicyUpdater",
+        "Description": "Transit VPC: AccountPolicyUpdater function responsible for updating Cross-Account Policy for VGW Poller.",
+        "Runtime": "python2.7",
+        "Timeout": "120",
+        "MemorySize": "128"
+      },
       "Poller": {
         "CodeLocation": "edc-lambdacode/transit-vpc-poller.py",
         "CodeRegion": "us-east-1",
@@ -295,9 +322,20 @@
         "Timeout": "120",
         "MemorySize": "128"
       },
+      "PeeringManager": {
+        "CodeLocation": "edc-lambdacode/peering-manager.py",
+        "CodeRegion": "us-east-1",
+        "Name": "peering-manager",
+        "Description": "Transit VPC: Peering Manager updates Peering when new VPNs are added or relationships are changed.",
+        "Runtime": "python2.7",
+        "Timeout": "120",
+        "MemorySize": "128"
+      },
       "FindReplace": {
         "S3BucketID": "%BUCKET_NAME%",
         "S3PrefixID": "%PREFIX%",
+        "AccountUpdatePolicyName": "%POLICY_NAME%",
+        "AccountUpdateRoleName": "%ROLE_NAME%",
         "Deliminator": "|"
       },
       "Csr": {
@@ -305,6 +343,80 @@
         "PasswordLength": "15",
         "PrivateKey": "prikey.pem",
         "PublicKey": "pubkey.pem"
+      }
+    },
+     "RouteDomains": {
+      "Development": {
+        "Name" : "development",
+        "RDNum": "100"
+      },
+       "DevelopmentMgmt": {
+        "Name" : "development-mgmt",
+        "RDNum": "101"
+      },
+       "Production": {
+        "Name" : "production",
+        "RDNum": "102"
+      },
+       "ProductionMgmt": {
+        "Name" : "production-mgmt",
+        "RDNum": "103"
+      }
+    },
+    "VPN": {
+      "EdcDcxDevCsr1": {
+        "EndPointIp": "10.0.252.18",
+        "PreSharedKey": "0Qp8RswnEmDxlaCurwiL2VJS",
+        "CsrTunnelIp": "10.251.1.126",
+        "CsrTunnelIpMask": "255.255.255.252",
+        "EdcTunnelIp": "10.251.1.125",
+        "EdcTunnelIpMask": "255.255.255.252",
+        "EdcBgpAsn": "65000"
+      },
+      "EdcDcxDevCsr2": {
+        "EndPointIp": "10.0.252.18",
+        "PreSharedKey": "0Qp8RswnEmDxlaCurwiL2VJS",
+        "CsrTunnelIp": "10.251.1.134",
+        "CsrTunnelIpMask" : "255.255.255.252",
+        "EdcTunnelIp": "10.251.1.133",
+        "EdcTunnelIpMask": "255.255.255.252",
+        "EdcBgpAsn": "65000"
+      },
+      "EdcDcxMgmtCsr1": {
+        "EndPointIp": "10.0.252.18",
+        "PreSharedKey": "0Qp8RswnEmDxlaCurwiL2VJS",
+        "CsrTunnelIp": "10.251.1.130",
+        "CsrTunnelIpMask" : "255.255.255.252",
+        "EdcTunnelIp": "10.251.1.129",
+        "EdcTunnelIpMask": "255.255.255.252",
+        "EdcBgpAsn": "65000"
+      },
+      "EdcDcxMgmtCsr2": {
+        "EndPointIp": "10.0.252.18",
+        "PreSharedKey": "0Qp8RswnEmDxlaCurwiL2VJS",
+        "CsrTunnelIp": "10.251.1.138",
+        "CsrTunnelIpMask" : "255.255.255.252",
+        "EdcTunnelIp": "10.251.1.137",
+        "EdcTunnelIpMask": "255.255.255.252",
+        "EdcBgpAsn": "65000"
+      },
+      "EdcBakupCsr1": {
+        "EndPointIp": "204.124.81.200",
+        "PreSharedKey": "0Qp8RswnEmDxlaCurwiL2VJS",
+        "CsrTunnelIp": "10.251.1.122",
+        "CsrTunnelIpMask" : "255.255.255.252",
+        "EdcTunnelIp": "10.251.1.121",
+        "EdcTunnelIpMask": "255.255.255.252",
+        "EdcBgpAsn": "65000"
+      },
+      "EdcBakupCsr2": {
+        "EndPointIp": "204.124.81.200",
+        "PreSharedKey": "0Qp8RswnEmDxlaCurwiL2VJS",
+        "CsrTunnelIp": "10.251.1.142",
+        "CsrTunnelIpMask" : "255.255.255.252",
+        "EdcTunnelIp": "10.251.1.141",
+        "EdcTunnelIpMask": "255.255.255.252",
+        "EdcBgpAsn": "65000"
       }
     },
     "CiscoCsrAMI": {
@@ -366,6 +478,18 @@
       }
     },
     "CsrInstance": {
+      "CSR1": {
+        "IPAddress" : "100.64.127.233",
+        "ENIAddress" : "100.64.127.234",
+        "EIPAlloc" : "eipalloc-8c5c39b9",
+        "EIP": "34.206.76.106"
+      },
+      "CSR2": {
+        "IPAddress": "100.64.127.249",
+        "ENIAddress": "100.64.127.250",
+        "EIPAlloc" : "eipalloc-095e3b3c",
+        "EIP" : "52.6.27.250"
+      },
       "2x500Mbps": {
         "Type": "c4.large",
         "Bandwidth": "500000"
@@ -878,24 +1002,22 @@
         }
       }
     },
-    "CsrEip1": {
-      "Type": "AWS::EC2::EIP",
-      "Properties": {
-        "Domain": "vpc",
-        "InstanceId": {
-          "Ref": "VpcCsr1"
-        }
-      }
-    },
-    "CsrEip2": {
-      "Type": "AWS::EC2::EIP",
-      "Properties": {
-        "Domain": "vpc",
-        "InstanceId": {
-          "Ref": "VpcCsr2"
-        }
-      }
-    },
+    "Eip1Association":{
+       "Type": "AWS::EC2::EIPAssociation",
+    "Properties":{
+    "AllocationId" : {"Fn::FindInMap":["CsrInstance","CSR1","EIPAlloc"]},
+    "InstanceId": {"Ref": "VpcCsr1"},
+    "PrivateIpAddress": {"Fn::GetAtt": ["VpcCsr1","PrivateIp"]}
+  }
+},
+    "Eip2Association":{
+       "Type": "AWS::EC2::EIPAssociation",
+    "Properties":{
+    "AllocationId" : {"Fn::FindInMap":["CsrInstance","CSR2","EIPAlloc"]},
+    "InstanceId": {"Ref": "VpcCsr2"},
+    "PrivateIpAddress": {"Fn::GetAtt": ["VpcCsr2","PrivateIp"]}
+  }
+},
     "VpcCsr1": {
       "Type": "AWS::EC2::Instance",
       "Metadata": {
@@ -946,6 +1068,7 @@
             "Value": "Transit VPC CSR1"
           }
         ],
+        "PrivateIpAddress": {"Fn::FindInMap": ["CsrInstance","CSR1","IPAddress"]},
         "UserData": {
           "Fn::Base64": {
             "Fn::Join": [
@@ -969,35 +1092,69 @@
                 "\"\n",
                 "ios-config-2=\"service password-encryption\"\n",
                 "ios-config-3=\"crypto isakmp policy 200\"\n",
-                "ios-config-4=\"encryption aes 128\"\n",
+                "ios-config-4=\"encryption aes 256\"\n",
                 "ios-config-5=\"authentication pre-share\"\n",
                 "ios-config-6=\"group 2\"\n",
                 "ios-config-7=\"lifetime 28800\"\n",
                 "ios-config-8=\"hash sha\"\n",
-                "ios-config-9=\"crypto ipsec transform-set ipsec-prop-vpn-aws esp-aes 128 esp-sha-hmac\"\n",
-                "ios-config-10=\"mode tunnel\"\n",
-                "ios-config-11=\"crypto ipsec df-bit clear\"\n",
-                "ios-config-12=\"crypto isakmp keepalive 15 10 on-demand\"\n",
-                "ios-config-13=\"crypto ipsec security-association replay window-size 1024\"\n",
-                "ios-config-14=\"crypto ipsec fragmentation before-encryption\"\n",
-                "ios-config-15=\"crypto ipsec profile ipsec-vpn-aws\"\n",
-                "ios-config-16=\"set pfs group2\"\n",
-                "ios-config-17=\"set security-association lifetime seconds 3600\"\n",
-                "ios-config-18=\"set transform-set ipsec-prop-vpn-aws\"\n",
-                "ios-config-19=\"router bgp ",
+                "ios-config-9=\"crypto isakmp policy 300\"\n",
+                "ios-config-10=\"encryption aes 128\"\n",
+                "ios-config-11=\"authentication pre-share\"\n",
+                "ios-config-12=\"group 2\"\n",
+                "ios-config-13=\"lifetime 28800\"\n",
+                "ios-config-14=\"hash sha\"\n",
+                "ios-config-15=\"crypto ipsec transform-set ipsec-prop-vpn-aws esp-aes 128 esp-sha256-hmac\"\n",
+                "ios-config-16=\"mode tunnel\"\n",
+                "ios-config-17=\"crypto ipsec df-bit clear\"\n",
+                "ios-config-18=\"crypto isakmp keepalive 15 10 on-demand\"\n",
+                "ios-config-19=\"crypto ipsec security-association replay window-size 1024\"\n",
+                "ios-config-20=\"crypto ipsec fragmentation before-encryption\"\n",
+                "ios-config-21=\"crypto ipsec profile ipsec-vpn-aws\"\n",
+                "ios-config-22=\"set pfs group2\"\n",
+                "ios-config-23=\"set security-association lifetime seconds 3600\"\n",
+                "ios-config-24=\"set transform-set ipsec-prop-vpn-aws\"\n",
+                "ios-config-25=\"crypto ipsec profile ipsec-vpn-edc\"\n",
+                "ios-config-26=\"set pfs group2\"\n",
+                "ios-config-27=\"set security-association lifetime seconds 3600\"\n",
+                "ios-config-28=\"set transform-set ipsec-prop-vpn-edc\"\n",
+                "ios-config-29=\"ip vrf ",{"Fn::FindInMap":["RouteDomains","Development","Name"]},"\"\n",
+                "ios-config-30=\"rd ",
+                {
+                  "Ref": "BgpAsn"
+                },
+                ":",{"Fn::FindInMap":["RouteDomains","Development","RDNum"]},"\"\n",
+                "ios-config-31=\"ip vrf ",{"Fn::FindInMap":["RouteDomains","DevelopmentMgmt","Name"]},"\"\n",
+                "ios-config-32=\"rd ",
+                {
+                  "Ref": "BgpAsn"
+                },
+                ":",{"Fn::FindInMap":["RouteDomains","DevelopmentMgmt","RDNum"]},"\"\n",
+                "ios-config-33=\"ip vrf ",{"Fn::FindInMap":["RouteDomains","Production","Name"]},"\"\n",
+                "ios-config-34=\"rd ",
+                {
+                  "Ref": "BgpAsn"
+                },
+                ":",{"Fn::FindInMap":["RouteDomains","Production","RDNum"]},"\"\n",
+                "ios-config-35=\"ip vrf ",{"Fn::FindInMap":["RouteDomains","ProductionMgmt","Name"]},"\"\n",
+                "ios-config-36=\"rd ",
+                {
+                  "Ref": "BgpAsn"
+                },
+                ":",{"Fn::FindInMap":["RouteDomains","ProductionMgmt","RDNum"]},"\"\n",
+                "ios-config-37=\"router bgp ",
                 {
                   "Ref": "BgpAsn"
                 },
                 "\"\n",
-                "ios-config-20=\"bgp log-neighbor-changes\"\n",
-                "ios-config-21=\"ip vrf vpn0\"\n",
-                "ios-config-22=\"rd ",
+                "ios-config-38=\"bgp log-neighbor-changes\"\n",
+                "ios-config-39=\"ip vrf vpn0\"\n",
+                "ios-config-40=\"rd ",
                 {
                   "Ref": "BgpAsn"
                 },
                 ":0\"\n",
-                "ios-config-23=\"ip ssh pubkey-chain\"\n",
-                "ios-config-24=\"username ",
+                "ios-config-41=\"ip ssh pubkey-chain\"\n",
+                "ios-config-42=\"username ",
                 {
                   "Fn::FindInMap": [
                     "Function",
@@ -1006,7 +1163,7 @@
                   ]
                 },
                 "\"\n",
-                "ios-config-25=\"key-hash ssh-rsa ",
+                "ios-config-43=\"key-hash ssh-rsa ",
                 {
                   "Fn::GetAtt": [
                     "CreateRsaKey",
@@ -1014,8 +1171,8 @@
                   ]
                 },
                 "\"\n",
-                "ios-config-26=\"ip ssh server algorithm authentication publickey\"\n",
-                "ios-config-27=\"ip ssh maxstartups 1\"\n"
+                "ios-config-44=\"ip ssh server algorithm authentication publickey\"\n",
+                "ios-config-45=\"ip ssh maxstartups 1\"\n"
               ]
             ]
           }
@@ -1072,6 +1229,7 @@
             "Value": "Transit VPC CSR2"
           }
         ],
+        "PrivateIpAddress": {"Fn::FindInMap": ["CsrInstance","CSR2","IPAddress"]},
         "UserData": {
           "Fn::Base64": {
             "Fn::Join": [
@@ -1095,35 +1253,69 @@
                 "\"\n",
                 "ios-config-2=\"service password-encryption\"\n",
                 "ios-config-3=\"crypto isakmp policy 200\"\n",
-                "ios-config-4=\"encryption aes 128\"\n",
+                "ios-config-4=\"encryption aes 256\"\n",
                 "ios-config-5=\"authentication pre-share\"\n",
                 "ios-config-6=\"group 2\"\n",
                 "ios-config-7=\"lifetime 28800\"\n",
                 "ios-config-8=\"hash sha\"\n",
-                "ios-config-9=\"crypto ipsec transform-set ipsec-prop-vpn-aws esp-aes 128 esp-sha-hmac\"\n",
-                "ios-config-10=\"mode tunnel\"\n",
-                "ios-config-11=\"crypto ipsec df-bit clear\"\n",
-                "ios-config-12=\"crypto isakmp keepalive 15 10 on-demand\"\n",
-                "ios-config-13=\"crypto ipsec security-association replay window-size 1024\"\n",
-                "ios-config-14=\"crypto ipsec fragmentation before-encryption\"\n",
-                "ios-config-15=\"crypto ipsec profile ipsec-vpn-aws\"\n",
-                "ios-config-16=\"set pfs group2\"\n",
-                "ios-config-17=\"set security-association lifetime seconds 3600\"\n",
-                "ios-config-18=\"set transform-set ipsec-prop-vpn-aws\"\n",
-                "ios-config-19=\"router bgp ",
+                "ios-config-9=\"crypto isakmp policy 300\"\n",
+                "ios-config-10=\"encryption aes 128\"\n",
+                "ios-config-11=\"authentication pre-share\"\n",
+                "ios-config-12=\"group 2\"\n",
+                "ios-config-13=\"lifetime 28800\"\n",
+                "ios-config-14=\"hash sha\"\n",
+                "ios-config-15=\"crypto ipsec transform-set ipsec-prop-vpn-aws esp-aes 128 esp-sha256-hmac\"\n",
+                "ios-config-16=\"mode tunnel\"\n",
+                "ios-config-17=\"crypto ipsec df-bit clear\"\n",
+                "ios-config-18=\"crypto isakmp keepalive 15 10 on-demand\"\n",
+                "ios-config-19=\"crypto ipsec security-association replay window-size 1024\"\n",
+                "ios-config-20=\"crypto ipsec fragmentation before-encryption\"\n",
+                "ios-config-21=\"crypto ipsec profile ipsec-vpn-aws\"\n",
+                "ios-config-22=\"set pfs group2\"\n",
+                "ios-config-23=\"set security-association lifetime seconds 3600\"\n",
+                "ios-config-24=\"set transform-set ipsec-prop-vpn-aws\"\n",
+                "ios-config-25=\"crypto ipsec profile ipsec-vpn-edc\"\n",
+                "ios-config-26=\"set pfs group2\"\n",
+                "ios-config-27=\"set security-association lifetime seconds 3600\"\n",
+                "ios-config-28=\"set transform-set ipsec-prop-vpn-edc\"\n",
+                "ios-config-29=\"ip vrf ",{"Fn::FindInMap":["RouteDomains","Development","Name"]},"\"\n",
+                "ios-config-30=\"rd ",
+                {
+                  "Ref": "BgpAsn"
+                },
+                ":",{"Fn::FindInMap":["RouteDomains","Development","RDNum"]},"\"\n",
+                "ios-config-31=\"ip vrf ",{"Fn::FindInMap":["RouteDomains","DevelopmentMgmt","Name"]},"\"\n",
+                "ios-config-32=\"rd ",
+                {
+                  "Ref": "BgpAsn"
+                },
+                ":",{"Fn::FindInMap":["RouteDomains","DevelopmentMgmt","RDNum"]},"\"\n",
+                "ios-config-33=\"ip vrf ",{"Fn::FindInMap":["RouteDomains","Production","Name"]},"\"\n",
+                "ios-config-34=\"rd ",
+                {
+                  "Ref": "BgpAsn"
+                },
+                ":",{"Fn::FindInMap":["RouteDomains","Production","RDNum"]},"\"\n",
+                "ios-config-35=\"ip vrf ",{"Fn::FindInMap":["RouteDomains","ProductionMgmt","Name"]},"\"\n",
+                "ios-config-36=\"rd ",
+                {
+                  "Ref": "BgpAsn"
+                },
+                ":",{"Fn::FindInMap":["RouteDomains","ProductionMgmt","RDNum"]},"\"\n",
+                "ios-config-37=\"router bgp ",
                 {
                   "Ref": "BgpAsn"
                 },
                 "\"\n",
-                "ios-config-20=\"bgp log-neighbor-changes\"\n",
-                "ios-config-21=\"ip vrf vpn0\"\n",
-                "ios-config-22=\"rd ",
+                "ios-config-38=\"bgp log-neighbor-changes\"\n",
+                "ios-config-39=\"ip vrf vpn0\"\n",
+                "ios-config-40=\"rd ",
                 {
                   "Ref": "BgpAsn"
                 },
                 ":0\"\n",
-                "ios-config-23=\"ip ssh pubkey-chain\"\n",
-                "ios-config-24=\"username ",
+                "ios-config-41=\"ip ssh pubkey-chain\"\n",
+                "ios-config-42=\"username ",
                 {
                   "Fn::FindInMap": [
                     "Function",
@@ -1132,7 +1324,7 @@
                   ]
                 },
                 "\"\n",
-                "ios-config-25=\"key-hash ssh-rsa ",
+                "ios-config-43=\"key-hash ssh-rsa ",
                 {
                   "Fn::GetAtt": [
                     "CreateRsaKey",
@@ -1140,12 +1332,54 @@
                   ]
                 },
                 "\"\n",
-                "ios-config-26=\"ip ssh server algorithm authentication publickey\"\n",
-                "ios-config-27=\"ip ssh maxstartups 1\"\n"
+                "ios-config-44=\"ip ssh server algorithm authentication publickey\"\n",
+                "ios-config-45=\"ip ssh maxstartups 1\"\n"
               ]
             ]
           }
         }
+      }
+    },
+    "Csr1PublicDNSRecord":{
+      "Type" : "AWS::Route53::RecordSet",
+      "DependsOn": "Eip1Association",
+      "Properties": {
+        "HostedZoneId": "ZLP98P780ZWPQ",
+        "Name": { "Fn::Join": ["",[{"Ref":"HostNameCsr1"},".transit.entrustdatacard.cloud."]]},
+        "Type": "A",
+        "TTL": "60",
+        "ResourceRecords": [{"Fn::FindInMap":["CsrInstance","CSR1","EIP"]}]
+      }
+    },
+    "Csr2PublicDNSRecord":{
+      "Type" : "AWS::Route53::RecordSet",
+      "DependsOn": "Eip2Association",
+      "Properties": {
+        "HostedZoneId": "ZLP98P780ZWPQ",
+        "Name": { "Fn::Join": ["",[{"Ref":"HostNameCsr2"},".transit.entrustdatacard.cloud."]]},
+        "Type": "A",
+        "TTL": "60",
+        "ResourceRecords": [{"Fn::FindInMap":["CsrInstance","CSR2","EIP"]}]
+      }
+    },
+    "Csr1IntDNSRecord":{
+      "Type" : "AWS::Route53::RecordSet",
+      "Properties": {
+        "HostedZoneId": "ZLP98P780ZWPQ",
+        "Name": { "Fn::Join": ["",[{"Ref":"HostNameCsr1"},"-int.transit.entrustdatacard.cloud."]]},
+        "Type": "A",
+        "TTL": "60",
+        "ResourceRecords": [{"Fn::GetAtt":["VpcCsr1","PrivateIp"]}]
+      }
+    },
+    "Csr2IntDNSRecord":{
+      "Type" : "AWS::Route53::RecordSet",
+      "Properties": {
+        "HostedZoneId": "ZLP98P780ZWPQ",
+        "Name": { "Fn::Join": ["",[{"Ref":"HostNameCsr2"},"-int.transit.entrustdatacard.cloud."]]},
+        "Type": "A",
+        "TTL": "60",
+        "ResourceRecords": [{"Fn::GetAtt":["VpcCsr2","PrivateIp"]}]
       }
     },
     "SolutionHelperRole": {
@@ -1247,6 +1481,12 @@
                     "TransitVpcPollerRole",
                     "Arn"
                   ]
+                },
+                {
+                  "Fn::GetAtt": [
+                    "TransitVpcAccountUpdateRole",
+                    "Arn"
+                  ]
                 }
               ]
             },
@@ -1280,6 +1520,31 @@
                 "s3:GetObject"
               ],
               "Resource": "arn:aws:s3:::edc-lambdacode/*"
+            },
+            {
+              "Effect": "Allow",
+              "Action": [
+                "dynamodb:PutItem"
+              ],
+              "Resource": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:aws:dynamodb:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":",
+                    {
+                      "Ref": "AWS::AccountId"
+                    },
+                    ":table/",
+                    {
+                      "Ref": "RouteDomainList"
+                    }
+                  ]
+                ]
+              }
             }
           ]
         }
@@ -1298,18 +1563,8 @@
         },
         "Description": "Transit VPC: CloudFormation custom resource function invoked during transit VPC CloudFormation create, update, and delete stack operations.",
         "Code": {
-          "S3Bucket": {
-            "Fn::Join": [
-              "",
-              [
-                "solutions-",
-                {
-                  "Ref": "AWS::Region"
-                }
-              ]
-            ]
-          },
-          "S3Key": "library/solution-helper/v3/solution-helper.zip"
+          "S3Bucket": "edc-lambdacode",
+          "S3Key": "solutionhelper.zip"
         },
         "Runtime": "python2.7",
         "Timeout": "60"
@@ -1697,14 +1952,10 @@
               },
               "',",
               "'EIP1':'",
-              {
-                "Ref": "CsrEip1"
-              },
+              {"Fn::FindInMap":["CsrInstance","CSR1","EIP"]},
               "',",
               "'EIP2':'",
-              {
-                "Ref": "CsrEip2"
-              },
+              {"Fn::FindInMap":["CsrInstance","CSR2","EIP"]},
               "',",
               "'PIP1':'",
               {
@@ -1806,6 +2057,216 @@
         }
       }
     },
+    "EdcVpnCSR1": {
+      "Type": "Custom::VPN",
+      "DependsOn" : ["CiscoConfigFunct","VpcCsr1","VpcCsr2"],
+      "Properties": {
+        "ServiceToken": {
+          "Fn::GetAtt": [
+            "SolutionHelper",
+            "Arn"
+          ]
+        },
+        "StoreInS3KMS": {
+          "Fn::Join": [
+            "",
+            [
+              "[{ 'Bucket' : '",
+              {
+                "Ref": "VPNConfigS3Bucket"
+              },
+              "', ",
+              "'Key' : '",
+              {
+                "Ref": "S3Prefix"
+              },
+              "CSR1/",
+              "edc-dev-vpn.conf', ",
+              "'SSEKMSKeyId' : 'arn:aws:kms:",
+              {
+                "Ref": "AWS::Region"
+              },
+              ":",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":key/",
+              {
+                "Ref": "KMSKey"
+              },
+              "', ",
+              "'Body': '",
+              "<?xml version=\"1.0\" ?><vpn_connection id=\"edc-dcx-dev\">",
+  "<customer_gateway_id>transit-csr1</customer_gateway_id>",
+  "<vpn_gateway_id>edc-dcx-endpoint</vpn_gateway_id>",
+  "<vpn_connection_type>ipsec.1</vpn_connection_type>",
+  "<ipsec_tunnel>",
+    "<customer_gateway><tunnel_outside_address><ip_address>",{"Fn::FindInMap": ["CsrInstance","CSR1","IPAddress"]},"</ip_address></tunnel_outside_address>",
+      "<tunnel_inside_address><ip_address>",{"Fn::FindInMap": ["VPN","EdcDcxDevCsr1","CsrTunnelIp"]},"</ip_address><network_mask>",{"Fn::FindInMap": ["VPN","EdcDcxDevCsr1","CsrTunnelIpMask"]},"</network_mask><network_cidr>30</network_cidr></tunnel_inside_address>",
+      "<bgp><asn>",{"Ref":"BgpAsn"},"</asn><hold_time>30</hold_time></bgp>",
+    "</customer_gateway><vpn_gateway><tunnel_outside_address><ip_address>",{"Fn::FindInMap": ["VPN","EdcDcxDevCsr1","EndPointIp"]},"</ip_address></tunnel_outside_address>",
+      "<tunnel_inside_address><ip_address>",{"Fn::FindInMap": ["VPN","EdcDcxDevCsr1","EdcTunnelIp"]},"</ip_address><network_mask>",{"Fn::FindInMap": ["VPN","EdcDcxDevCsr1","EdcTunnelIpMask"]},"</network_mask><network_cidr>30</network_cidr></tunnel_inside_address>",
+      "<bgp><asn>",{"Fn::FindInMap": ["VPN","EdcDcxDevCsr1","EdcBgpAsn"]},"</asn><hold_time>30</hold_time></bgp>",
+    "</vpn_gateway>",
+    "<ike><authentication_protocol>sha256</authentication_protocol><encryption_protocol>aes-256-cbc</encryption_protocol><lifetime>28800</lifetime><perfect_forward_secrecy>group2</perfect_forward_secrecy><mode>main</mode><pre_shared_key>",{"Fn::FindInMap": ["VPN","EdcDcxDevCsr1","PreSharedKey"]},"</pre_shared_key></ike>",
+    "<ipsec><protocol>esp</protocol><authentication_protocol>hmac-sha256-96</authentication_protocol><encryption_protocol>aes-256-cbc</encryption_protocol><lifetime>3600</lifetime><perfect_forward_secrecy>group2</perfect_forward_secrecy><mode>tunnel</mode><clear_df_bit>true</clear_df_bit><fragmentation_before_encryption>true</fragmentation_before_encryption><tcp_mss_adjustment>1379</tcp_mss_adjustment>",
+      "<dead_peer_detection><interval>10</interval><retries>3</retries></dead_peer_detection>",
+    "</ipsec></ipsec_tunnel>",
+              "<ipsec_tunnel>",
+    "<customer_gateway><tunnel_outside_address><ip_address>",{"Fn::FindInMap": ["CsrInstance","CSR1","IPAddress"]},"</ip_address></tunnel_outside_address>",
+      "<tunnel_inside_address><ip_address>",{"Fn::FindInMap": ["VPN","EdcBakupCsr1","CsrTunnelIp"]},"</ip_address><network_mask>",{"Fn::FindInMap": ["VPN","EdcBakupCsr1","CsrTunnelIpMask"]},"</network_mask><network_cidr>30</network_cidr></tunnel_inside_address>",
+      "<bgp><asn>",{"Ref":"BgpAsn"},"</asn><hold_time>30</hold_time></bgp>",
+    "</customer_gateway><vpn_gateway><tunnel_outside_address><ip_address>",{"Fn::FindInMap": ["VPN","EdcBakupCsr1","EndPointIp"]},"</ip_address></tunnel_outside_address>",
+      "<tunnel_inside_address><ip_address>",{"Fn::FindInMap": ["VPN","EdcBakupCsr1","EdcTunnelIp"]},"</ip_address><network_mask>",{"Fn::FindInMap": ["VPN","EdcBakupCsr1","EdcTunnelIpMask"]},"</network_mask><network_cidr>30</network_cidr></tunnel_inside_address>",
+      "<bgp><asn>",{"Fn::FindInMap": ["VPN","EdcDcxMgmtCsr1","EdcBgpAsn"]},"</asn><hold_time>30</hold_time></bgp>",
+    "</vpn_gateway>",
+    "<ike><authentication_protocol>sha256</authentication_protocol><encryption_protocol>aes-256-cbc</encryption_protocol><lifetime>28800</lifetime><perfect_forward_secrecy>group2</perfect_forward_secrecy><mode>main</mode><pre_shared_key>",{"Fn::FindInMap": ["VPN","EdcBakupCsr1","PreSharedKey"]},"</pre_shared_key></ike>",
+    "<ipsec><protocol>esp</protocol><authentication_protocol>hmac-sha256-96</authentication_protocol><encryption_protocol>aes-256-cbc</encryption_protocol><lifetime>3600</lifetime><perfect_forward_secrecy>group2</perfect_forward_secrecy><mode>tunnel</mode><clear_df_bit>true</clear_df_bit><fragmentation_before_encryption>true</fragmentation_before_encryption><tcp_mss_adjustment>1379</tcp_mss_adjustment>",
+      "<dead_peer_detection><interval>10</interval><retries>3</retries></dead_peer_detection>",
+    "</ipsec></ipsec_tunnel>",
+  "<transit_vpc_config><account_id>228198000189</account_id><vpn_endpoint>CSR1</vpn_endpoint><status>create</status><preferred_path>none</preferred_path><route_domain>",{"Fn::FindInMap": ["RouteDomains","Development","Name"]},"</route_domain><domain_asn>",{"Ref": "BgpAsn"},":",{"Fn::FindInMap": ["RouteDomains","Development","RDNum"]},"</domain_asn></transit_vpc_config></vpn_connection>",
+              "'",
+              "}]"
+            ]
+          ]
+        }
+      }
+    },
+    "EdcVpnCSR2": {
+      "Type": "Custom::VPN",
+      "DependsOn" : ["CiscoConfigFunct","VpcCsr1","VpcCsr2"],
+      "Properties": {
+        "ServiceToken": {
+          "Fn::GetAtt": [
+            "SolutionHelper",
+            "Arn"
+          ]
+        },
+        "StoreInS3KMS": {
+          "Fn::Join": [
+            "",
+            [
+              "[{ 'Bucket' : '",
+              {
+                "Ref": "VPNConfigS3Bucket"
+              },
+              "', ",
+              "'Key' : '",
+              {
+                "Ref": "S3Prefix"
+              },
+              "CSR2/",
+              "edc-dev-vpn.conf', ",
+              "'SSEKMSKeyId' : 'arn:aws:kms:",
+              {
+                "Ref": "AWS::Region"
+              },
+              ":",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":key/",
+              {
+                "Ref": "KMSKey"
+              },
+              "', ",
+              "'Body': '",
+              "<?xml version=\"1.0\" ?><vpn_connection id=\"edc-dcx-dev\">",
+  "<customer_gateway_id>transit-csr1</customer_gateway_id>",
+  "<vpn_gateway_id>edc-dcx-endpoint</vpn_gateway_id>",
+  "<vpn_connection_type>ipsec.1</vpn_connection_type>",
+  "<ipsec_tunnel>",
+    "<customer_gateway><tunnel_outside_address><ip_address>",{"Fn::FindInMap": ["CsrInstance","CSR2","IPAddress"]},"</ip_address></tunnel_outside_address>",
+      "<tunnel_inside_address><ip_address>",{"Fn::FindInMap": ["VPN","EdcDcxDevCsr2","CsrTunnelIp"]},"</ip_address><network_mask>",{"Fn::FindInMap": ["VPN","EdcDcxDevCsr2","CsrTunnelIpMask"]},"</network_mask><network_cidr>30</network_cidr></tunnel_inside_address>",
+      "<bgp><asn>",{"Ref":"BgpAsn"},"</asn><hold_time>30</hold_time></bgp>",
+    "</customer_gateway><vpn_gateway><tunnel_outside_address><ip_address>",{"Fn::FindInMap": ["VPN","EdcDcxDevCsr2","EndPointIp"]},"</ip_address></tunnel_outside_address>",
+      "<tunnel_inside_address><ip_address>",{"Fn::FindInMap": ["VPN","EdcDcxDevCsr2","EdcTunnelIp"]},"</ip_address><network_mask>",{"Fn::FindInMap": ["VPN","EdcDcxDevCsr2","EdcTunnelIpMask"]},"</network_mask><network_cidr>30</network_cidr></tunnel_inside_address>",
+      "<bgp><asn>",{"Fn::FindInMap": ["VPN","EdcDcxDevCsr2","EdcBgpAsn"]},"</asn><hold_time>30</hold_time></bgp>",
+    "</vpn_gateway>",
+    "<ike><authentication_protocol>sha256</authentication_protocol><encryption_protocol>aes-256-cbc</encryption_protocol><lifetime>28800</lifetime><perfect_forward_secrecy>group2</perfect_forward_secrecy><mode>main</mode><pre_shared_key>",{"Fn::FindInMap": ["VPN","EdcDcxDevCsr1","PreSharedKey"]},"</pre_shared_key></ike>",
+    "<ipsec><protocol>esp</protocol><authentication_protocol>hmac-sha256-96</authentication_protocol><encryption_protocol>aes-256-cbc</encryption_protocol><lifetime>3600</lifetime><perfect_forward_secrecy>group2</perfect_forward_secrecy><mode>tunnel</mode><clear_df_bit>true</clear_df_bit><fragmentation_before_encryption>true</fragmentation_before_encryption><tcp_mss_adjustment>1379</tcp_mss_adjustment>",
+      "<dead_peer_detection><interval>10</interval><retries>3</retries></dead_peer_detection>",
+    "</ipsec></ipsec_tunnel>",
+              "<ipsec_tunnel>",
+    "<customer_gateway><tunnel_outside_address><ip_address>",{"Fn::FindInMap": ["CsrInstance","CSR2","IPAddress"]},"</ip_address></tunnel_outside_address>",
+      "<tunnel_inside_address><ip_address>",{"Fn::FindInMap": ["VPN","EdcBakupCsr2","CsrTunnelIp"]},"</ip_address><network_mask>",{"Fn::FindInMap": ["VPN","EdcBakupCsr2","CsrTunnelIpMask"]},"</network_mask><network_cidr>30</network_cidr></tunnel_inside_address>",
+      "<bgp><asn>",{"Ref":"BgpAsn"},"</asn><hold_time>30</hold_time></bgp>",
+    "</customer_gateway><vpn_gateway><tunnel_outside_address><ip_address>",{"Fn::FindInMap": ["VPN","EdcBakupCsr2","EndPointIp"]},"</ip_address></tunnel_outside_address>",
+      "<tunnel_inside_address><ip_address>",{"Fn::FindInMap": ["VPN","EdcBakupCsr2","EdcTunnelIp"]},"</ip_address><network_mask>",{"Fn::FindInMap": ["VPN","EdcBakupCsr2","EdcTunnelIpMask"]},"</network_mask><network_cidr>30</network_cidr></tunnel_inside_address>",
+      "<bgp><asn>",{"Fn::FindInMap": ["VPN","EdcBakupCsr2","EdcBgpAsn"]},"</asn><hold_time>30</hold_time></bgp>",
+    "</vpn_gateway>",
+    "<ike><authentication_protocol>sha256</authentication_protocol><encryption_protocol>aes-256-cbc</encryption_protocol><lifetime>28800</lifetime><perfect_forward_secrecy>group2</perfect_forward_secrecy><mode>main</mode><pre_shared_key>",{"Fn::FindInMap": ["VPN","EdcBakupCsr2","PreSharedKey"]},"</pre_shared_key></ike>",
+    "<ipsec><protocol>esp</protocol><authentication_protocol>hmac-sha256-96</authentication_protocol><encryption_protocol>aes-256-cbc</encryption_protocol><lifetime>3600</lifetime><perfect_forward_secrecy>group2</perfect_forward_secrecy><mode>tunnel</mode><clear_df_bit>true</clear_df_bit><fragmentation_before_encryption>true</fragmentation_before_encryption><tcp_mss_adjustment>1379</tcp_mss_adjustment>",
+      "<dead_peer_detection><interval>10</interval><retries>3</retries></dead_peer_detection>",
+    "</ipsec></ipsec_tunnel>",
+  "<transit_vpc_config><account_id>228198000189</account_id><vpn_endpoint>CSR1</vpn_endpoint><status>create</status><preferred_path>none</preferred_path><route_domain>",{"Fn::FindInMap": ["RouteDomains","Development","Name"]},"</route_domain><domain_asn>",{"Ref": "BgpAsn"},":",{"Fn::FindInMap": ["RouteDomains","Development","RDNum"]},"</domain_asn></transit_vpc_config></vpn_connection>",
+              "'",
+              "}]"
+            ]
+          ]
+        }
+      }
+    },
+    "DevRouteDomain": {
+      "Type": "Custom::RouteDomain",
+      "Properties": {
+        "ServiceToken": {
+          "Fn::GetAtt": [
+            "SolutionHelper",
+            "Arn"
+          ]
+        },
+        "StoreInDDB": {
+          "Fn::Join" : [ "",[
+          "{'TableName': '",{"Ref": "RouteDomainList"},"',",
+          "'Item': {'rd_name': {'S':'",{"Fn::FindInMap": ["RouteDomains","Development","Name"]},"'},'vrf_asn':{'S':'",{"Ref": "BgpAsn"},":",{"Fn::FindInMap": ["RouteDomains","Development","RDNum"]},"'}}}"]]}
+        }
+      },
+    "DevMgmtRouteDomain": {
+      "Type": "Custom::RouteDomain",
+      "Properties": {
+        "ServiceToken": {
+          "Fn::GetAtt": [
+            "SolutionHelper",
+            "Arn"
+          ]
+        },
+        "StoreInDDB": {
+          "Fn::Join" : [ "",[
+          "{'TableName': '",{"Ref": "RouteDomainList"},"',",
+          "'Item': {'rd_name': {'S':'",{"Fn::FindInMap": ["RouteDomains","DevelopmentMgmt","Name"]},"'},'vrf_asn':{'S':'",{"Ref": "BgpAsn"},":",{"Fn::FindInMap": ["RouteDomains","DevelopmentMgmt","RDNum"]},"'}}}"]]}
+        }
+      },
+    "ProdRouteDomain": {
+      "Type": "Custom::RouteDomain",
+      "Properties": {
+        "ServiceToken": {
+          "Fn::GetAtt": [
+            "SolutionHelper",
+            "Arn"
+          ]
+        },
+        "StoreInDDB": {
+          "Fn::Join" : [ "",[
+          "{'TableName': '",{"Ref": "RouteDomainList"},"',",
+          "'Item': {'rd_name': {'S':'",{"Fn::FindInMap": ["RouteDomains","Production","Name"]},"'},'vrf_asn':{'S':'",{"Ref": "BgpAsn"},":",{"Fn::FindInMap": ["RouteDomains","Production","RDNum"]},"'}}}"]]}
+        }
+      },
+    "ProdMgmtRouteDomain": {
+      "Type": "Custom::RouteDomain",
+      "Properties": {
+        "ServiceToken": {
+          "Fn::GetAtt": [
+            "SolutionHelper",
+            "Arn"
+          ]
+        },
+        "StoreInDDB": {
+          "Fn::Join" : [ "",[
+          "{'TableName': '",{"Ref": "RouteDomainList"},"',",
+          "'Item': {'rd_name': {'S':'",{"Fn::FindInMap": ["RouteDomains","ProductionMgmt","Name"]},"'},'vrf_asn':{'S':'",{"Ref": "BgpAsn"},":",{"Fn::FindInMap": ["RouteDomains","ProductionMgmt","RDNum"]},"'}}}"]]}
+        }
+      },
     "TransitVpcPollerRole": {
       "Type": "AWS::IAM::Role",
       "Properties": {
@@ -1923,8 +2384,30 @@
                   ]
                 ]
               }
+            },
+            {
+              "Effect": "Allow",
+              "Action": "sts:AssumeRole",
+              "Resource": "arn:aws:iam::660369111642:role/ListOrganizations"
             }
           ]
+        }
+      }
+    },
+    "TransitVpcPollerXAccountPolicy" : {
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+	  "Roles" : [ { "Ref" : "TransitVpcPollerRole" } ],
+          "PolicyName": "TransitPollerXAccount",
+          "PolicyDocument": {
+              "Version" : "2012-10-17",
+	      "Statement": [
+		{
+		  "Effect": "Allow",
+		  "Action": "sts:AssumeRole",
+		  "Resource" : {"Fn::Join":["",[ "arn:aws:iam::", {"Ref": "AWS::AccountId"}, ":role/TransitXAccountPollerRole"]]}
+		}
+	     ]
         }
       }
     },
@@ -2066,6 +2549,462 @@
               },
               {
                 "Ref": "S3Prefix"
+              }
+            ]
+          ]
+        }
+      }
+    },
+    "TransitVpcAccountUpdateRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com"
+              },
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        },
+        "Path": "/"
+      }
+    },
+    "TransitVpcAccountUpdateRolePolicy": {
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "Roles": [
+          {
+            "Ref": "TransitVpcAccountUpdateRole"
+          }
+        ],
+        "PolicyName": "Transit_VPC_Account_Update_Function_Permissions",
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "logs:CreateLogGroup",
+                "logs:CreateLogStream",
+                "logs:PutLogEvents"
+              ],
+              "Resource": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:aws:logs:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":",
+                    {
+                      "Ref": "AWS::AccountId"
+                    },
+                    ":log-group:/aws/lambda/*"
+                  ]
+                ]
+              }
+            },
+            {
+              "Effect": "Allow",
+              "Action": [
+                "iam:GetRolePolicy",
+                "iam:CreatePolicy",
+                "iam:CreatePolicyVersion",
+                "iam:DeletePolicyVersion",
+                "iam:DeleteRolePolicy",
+                "iam:AttachRolePolicy",
+                "iam:PutRolePolicy"
+              ],
+              "Resource": "*"
+            },
+            {
+              "Effect": "Allow",
+              "Action": "sts:AssumeRole",
+              "Resource": "arn:aws:iam::660369111642:role/ListOrganizations"
+            }
+          ]
+        }
+      }
+    },
+     "PeeringFunct": {
+      "DependsOn": "CiscoConfigFunct",
+      "Type": "Custom::LoadLambda",
+      "Properties": {
+        "ServiceToken": {
+          "Fn::GetAtt": [
+            "SolutionHelper",
+            "Arn"
+          ]
+        },
+        "Region": {
+          "Ref": "AWS::Region"
+        },
+        "LambdaCode": {
+          "Fn::FindInMap": [
+            "Function",
+            "PeeringManager",
+            "CodeLocation"
+          ]
+        },
+        "LambdaCodeRegion": {
+          "Fn::FindInMap": [
+            "Function",
+            "PeeringManager",
+            "CodeRegion"
+          ]
+        },
+        "Deliminator": {
+          "Fn::FindInMap": [
+            "Function",
+            "FindReplace",
+            "Deliminator"
+          ]
+        },
+        "FunctionName": {
+          "Fn::Join": [
+            "",
+            [
+              {
+                "Ref": "AWS::StackName"
+              },
+              "-",
+              {
+                "Fn::FindInMap": [
+                  "Function",
+                  "PeeringManager",
+                  "Name"
+                ]
+              }
+            ]
+          ]
+        },
+        "Role": {
+          "Fn::GetAtt": [
+            "TransitVpcPeeringRole",
+            "Arn"
+          ]
+        },
+        "CloudWatchEvent": {
+          "Fn::Join": [
+            "",
+            [
+              "{ 'RuleName' : '",
+              {
+                "Ref": "AWS::StackName"
+              },
+              "-VGW-Peering-1hr', ",
+              "'ScheduleExpression' : 'cron(0 0 0/1 1/1 * ? *)',",
+              "'Description': 'Transit VPC: Rule to trigger Peering Manager.' }"
+            ]
+          ]
+        },
+        "Runtime": {
+          "Fn::FindInMap": [
+            "Function",
+            "PeeringManager",
+            "Runtime"
+          ]
+        },
+        "Description": {
+          "Fn::FindInMap": [
+            "Function",
+            "PeeringManager",
+            "Description"
+          ]
+        },
+        "Timeout": {
+          "Fn::FindInMap": [
+            "Function",
+            "PeeringManager",
+            "Timeout"
+          ]
+        },
+        "MemorySize": {
+          "Fn::FindInMap": [
+            "Function",
+            "PeeringManager",
+            "MemorySize"
+          ]
+        },
+        "FindReplace": {
+          "Fn::Join": [
+            "",
+            [
+              {
+                "Fn::FindInMap": [
+                  "Function",
+                  "FindReplace",
+                  "S3BucketID"
+                ]
+              },
+              {
+                "Fn::FindInMap": [
+                  "Function",
+                  "FindReplace",
+                  "Deliminator"
+                ]
+              },
+              {
+                "Ref": "VPNConfigS3Bucket"
+              },
+              ",",
+              {
+                "Fn::FindInMap": [
+                  "Function",
+                  "FindReplace",
+                  "S3PrefixID"
+                ]
+              },
+              {
+                "Fn::FindInMap": [
+                  "Function",
+                  "FindReplace",
+                  "Deliminator"
+                ]
+              },
+              {
+                "Ref": "S3Prefix"
+              }
+            ]
+          ]
+        }
+      }
+    },
+    "TransitVpcPeeringRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com"
+              },
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        },
+        "Path": "/"
+      }
+    },
+    "TransitVpcPollerRolePolicy": {
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "Roles": [
+          {
+            "Ref": "TransitVpcPeeringRole"
+          }
+        ],
+        "PolicyName": "Transit_VPC_Peering_Function_Permissions",
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "logs:CreateLogGroup",
+                "logs:CreateLogStream",
+                "logs:PutLogEvents"
+              ],
+              "Resource": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:aws:logs:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":",
+                    {
+                      "Ref": "AWS::AccountId"
+                    },
+                    ":log-group:/aws/lambda/*"
+                  ]
+                ]
+              }
+            },
+            {
+              "Effect": "Allow",
+              "Action": [
+                "s3:PutObject",
+                "s3:PutObjectAcl",
+                "s3:GetObject"
+              ],
+              "Resource": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:aws:s3:::",
+                    {
+                      "Ref": "VPNConfigS3Bucket"
+                    },
+                    "/",
+                    {
+                      "Ref": "S3Prefix"
+                    },
+                    "*"
+                  ]
+                ]
+              }
+            },
+            {
+              "Effect": "Allow",
+              "Action": [
+                "dynamodb:DescribeTable",
+                "dynamodb:Query",
+                "dynamodb:Scan",
+                "dynamodb:UpdateItem"
+              ],
+              "Resource": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:aws:dynamodb:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":",
+                    {
+                      "Ref": "AWS::AccountId"
+                    },
+                    ":table/",
+                    {
+                      "Ref": "RouteDomainList"
+                    }
+                  ]
+                ]
+              }
+            }
+          ]
+        }
+      }
+    },
+    "AccountUpdateFunct": {
+      "Type": "Custom::LoadLambda",
+      "DependsOn": "PollerFunct",
+      "Properties": {
+        "ServiceToken": {
+          "Fn::GetAtt": [
+            "SolutionHelper",
+            "Arn"
+          ]
+        },
+        "Region": {
+          "Ref": "AWS::Region"
+        },
+        "LambdaCode": {
+          "Fn::FindInMap": [
+            "Function",
+            "AccountUpdate",
+            "CodeLocation"
+          ]
+        },
+        "LambdaCodeRegion": {
+          "Fn::FindInMap": [
+            "Function",
+            "AccountUpdate",
+            "CodeRegion"
+          ]
+        },
+        "Deliminator": {
+          "Fn::FindInMap": [
+            "Function",
+            "FindReplace",
+            "Deliminator"
+          ]
+        },
+        "FunctionName": {
+          "Fn::Join": [
+            "",
+            [
+              {
+                "Ref": "AWS::StackName"
+              },
+              "-",
+              {
+                "Fn::FindInMap": [
+                  "Function",
+                  "AccountUpdate",
+                  "Name"
+                ]
+              }
+            ]
+          ]
+        },
+        "Role": {
+          "Fn::GetAtt": [
+            "TransitVpcAccountUpdateRole",
+            "Arn"
+          ]
+        },
+        "CloudWatchEvent": {
+          "Fn::Join": [
+            "",
+            [
+              "{ 'RuleName' : '",
+              {
+                "Ref": "AWS::StackName"
+              },
+              "-AccountUpdate-1min', ",
+              "'ScheduleExpression' : 'cron(* * * * ? *)',",
+              "'Description': 'Transit VPC: Rule to trigger AccountUpdate every minute to find VGWs that need to be attached to the transit VPC.' }"
+            ]
+          ]
+        },
+        "Runtime": {
+          "Fn::FindInMap": [
+            "Function",
+            "AccountUpdate",
+            "Runtime"
+          ]
+        },
+        "Description": {
+          "Fn::FindInMap": [
+            "Function",
+            "AccountUpdate",
+            "Description"
+          ]
+        },
+        "Timeout": {
+          "Fn::FindInMap": [
+            "Function",
+            "AccountUpdate",
+            "Timeout"
+          ]
+        },
+        "MemorySize": {
+          "Fn::FindInMap": [
+            "Function",
+            "AccountUpdate",
+            "MemorySize"
+          ]
+        },
+        "FindReplace": {
+          "Fn::Join": [
+            "",
+            [
+              {
+                "Fn::FindInMap": [
+                  "Function",
+                  "FindReplace",
+                  "AccountUpdateRoleName"
+                ]
+              },
+              {
+                "Fn::FindInMap": [
+                  "Function",
+                  "FindReplace",
+                  "Deliminator"
+                ]
+              },
+              {
+               "Ref" : "TransitVpcPollerRole"
               }
             ]
           ]
@@ -2227,6 +3166,12 @@
             "SourceSecurityGroupId": {
               "Ref": "CiscoConfigSecurityGroup"
             }
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "0",
+            "ToPort": "22",
+            "CidrIp": "0.0.0.0/0"
           }
         ],
         "SecurityGroupEgress": [
