@@ -7,7 +7,7 @@ from boto3.dynamodb.conditions import Key, Attr
 import logging
 
 log = logging.getLogger()
-log.setLevel(logging.DEBUG)
+log.setLevel(logging.INFO)
 
 
 bucket_name='%BUCKET_NAME%'
@@ -51,10 +51,13 @@ def peer_config(router,table):
     for rd in peer_list(table):
         for peer in rd['Peers']:
             if peer_validate(table,peer):
-                for vpn in rd[router + '_Associated_VPNs']:
-                    config.append('ip vrf {}'.format(vpn))
-                    config.append('route-target import {}'.format(get_peer_asn(table,peer)))
-                    config.append('exit')
+                try:
+                    for vpn in rd[router + '_Associated_VPNs']:
+                        config.append('ip vrf {}'.format(vpn))
+                        config.append('route-target import {}'.format(get_peer_asn(table,peer)))
+                        config.append('exit')
+                except KeyError:
+                    continue
     return config
 
 
@@ -68,6 +71,6 @@ def lambda_handler(event,context):
         config = peer_config(router,rdomain_table)
         log.info('Peering Build is Complete')
         log.info('%s',config)
-        s3 = boto3.resource('s3')
-        s3.put_object( Body=config,Bucket=bucket_name,Key=bucket_prefix + router +'/' + 'peering.conf',ACL='bucket-owner-full-control',ServerSideEncryption='aws:kms',SSEKMSKeyId=env_config['KMS_KEY'])
+        body = str("\n").join(config)
+        s3.put_object( Body=body,Bucket=bucket_name,Key=bucket_prefix + router +'/' + 'peering.conf',ACL='bucket-owner-full-control',ServerSideEncryption='aws:kms',SSEKMSKeyId=env_config['KMS_KEY'])
         print config

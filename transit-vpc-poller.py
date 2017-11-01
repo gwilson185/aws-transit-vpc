@@ -22,7 +22,7 @@ import datetime, sys, json, urllib2, urllib, re
 from boto3.dynamodb.conditions import Key, Attr
 
 log = logging.getLogger()
-log.setLevel(logging.DEBUG)
+log.setLevel(logging.INFO)
 
 bucket_name='%BUCKET_NAME%'
 bucket_prefix='%PREFIX%'
@@ -71,9 +71,9 @@ def getTags(vgwTags):
 def rdcheck(bucket_name, bucket_prefix, config, rdtag, rdtable):
     s3 = boto3.client('s3')
     rd = rdtable.query(KeyConditionExpression=Key('rd_name').eq(rdtag))
-    if json.dumps(rd['Count']) == '1':
-        if 'vrf_asn' in json.dumps(rd['Items']):
-            d = json.loads(json.dumps(rd['Items'][0]))
+    if rd['Count'] == 1:
+        if 'vrf_asn' in rd['Items'][0]:
+            d = rd['Items'][0]
             log.info('Routing Domain %s is assigned ASN %s', d['rd_name'], d['vrf_asn'])
 
             return {'Value':'CONFIGURED','rd':{'rd_name':d['rd_name'],'vrf_asn':d['vrf_asn']}}
@@ -166,7 +166,7 @@ def sendAnonymousData(config, vgwTags, region_id, vpn_connections):
         log.debug("Response from APIGateway: %s, %s", rspcode, content)
 
 
-def lambda_handler(event, context):
+def vgw_poller(account,context):
     # Figure out the account number by parsing this function's ARN
     account_id = re.findall(':(\d+):', context.invoked_function_arn)[0]
     # Retrieve Transit VPC configuration from transit_vpn_config.txt
@@ -181,205 +181,223 @@ def lambda_handler(event, context):
     # Get list of regions so poller can look for VGWs in all regions
     ec2 = boto3.client('ec2', region_name='us-east-1')
     regions = ec2.describe_regions()
-    #Get list of Accounts
-    accounts = account_id_list()
     # Establish Route Domain list from Dynamodb list
     rdomain_db = boto3.resource('dynamodb')
     rdomain_table = rdomain_db.Table(config['RD_LIST'])
 
-    for acct in accounts:
-        acct_role = boto3.client('sts')
-        try:
-            response = acct_role.assume_role(RoleArn="arn:aws:iam::" + acct + ":role/TransitXAccountPollerRole",
-                                RoleSessionName="transit-poller_session",
-                                DurationSeconds=900)
-            log.info("Assuming Transit_PollerRole in Account %s", acct)
-        except ClientError, e:
-            log.debug(str(e))
-            log.info('Could not get access to Account %s',acct)
-            continue
+    acct_role = boto3.client('sts')
+    try:
+        response = acct_role.assume_role(RoleArn="arn:aws:iam::" + account + ":role/TransitXAccountPollerRole",
+                            RoleSessionName="transit-poller_session",
+                            DurationSeconds=900)
+        log.info("Assuming Transit_PollerRole in Account %s", account)
+    except ClientError, e:
+        log.debug(str(e))
+        log.info('Could not get access to Account %s',account)
 
-        for region in regions['Regions']:
-            # Get region name for the current region
-            region_id = region['RegionName']
-            log.debug('Checking region: %s', region_id)
-            # Create EC2 connection to this region to get list of VGWs
-            ec2 = boto3.client('ec2', region_name=region_id, aws_access_key_id=response['Credentials']['AccessKeyId'],
-                                                aws_secret_access_key=response['Credentials']['SecretAccessKey'],
-                                                aws_session_token=response['Credentials']['SessionToken'])
-            # Get list of VGWs that are available and tagged for Transit VPC
-            # vgws=ec2.describe_vpn_gateways(Filters=[
-            #  {'Name':'state','Values':['available', 'attached', 'detached']},
-            #  {'Name': 'tag-key', 'Values': [config['HUB_TAG']]}
-            # ])
-            # Get list of all VGWs in the region
-            vgws = ec2.describe_vpn_gateways(Filters=[
-                {'Name': 'state', 'Values': ['available', 'attached', 'detached']}
-            ],)
-            # Get list of Transit VPC tagged VPN connections in the region as well
-            vpns = ec2.describe_vpn_connections(Filters=[
-                {'Name': 'state', 'Values': ['available', 'pending', 'deleting']},
-                {'Name': 'tag:' + config['HUB_TAG'], 'Values': [config['HUB_TAG_VALUE']]}
-            ])
+    for region in regions['Regions']:
+        # Get region name for the current region
+        region_id = region['RegionName']
+        log.debug('Checking region: %s', region_id)
+        # Create EC2 connection to this region to get list of VGWs
+        ec2 = boto3.client('ec2', region_name=region_id, aws_access_key_id=response['Credentials']['AccessKeyId'],
+                                            aws_secret_access_key=response['Credentials']['SecretAccessKey'],
+                                            aws_session_token=response['Credentials']['SessionToken'])
+        # Get list of VGWs that are available and tagged for Transit VPC
+        # vgws=ec2.describe_vpn_gateways(Filters=[
+        #  {'Name':'state','Values':['available', 'attached', 'detached']},
+        #  {'Name': 'tag-key', 'Values': [config['HUB_TAG']]}
+        # ])
+        # Get list of all VGWs in the region
+        vgws = ec2.describe_vpn_gateways(Filters=[
+            {'Name': 'state', 'Values': ['available', 'attached', 'detached']}
+        ],)
+        # Get list of Transit VPC tagged VPN connections in the region as well
+        vpns = ec2.describe_vpn_connections(Filters=[
+            {'Name': 'state', 'Values': ['available', 'pending', 'deleting']},
+            {'Name': 'tag:' + config['HUB_TAG'], 'Values': [config['HUB_TAG_VALUE']]}
+        ])
 
-            # Process all the VGWs in the region
-            for vgw in vgws['VpnGateways']:
-                # Check to see if the VGW has tags, if not, then we should skip it
-                if vgw.get('Tags', '') == '':
-                    continue
+        # Process all the VGWs in the region
+        for vgw in vgws['VpnGateways']:
+            # Check to see if the VGW has tags, if not, then we should skip it
+            if vgw.get('Tags', '') == '':
+                continue
 
-                # Put all of the VGW tags into a dict for easier processing
-                vgwTags = getTags(vgw['Tags'])
+            # Put all of the VGW tags into a dict for easier processing
+            vgwTags = getTags(vgw['Tags'])
 
-                # Configure HUB_TAG if it is not set already (for untagged VGWs)
-                vgwTags[config['HUB_TAG']] = vgwTags.get(config['HUB_TAG'], '')
+            # Configure HUB_TAG if it is not set already (for untagged VGWs)
+            vgwTags[config['HUB_TAG']] = vgwTags.get(config['HUB_TAG'], '')
 
-                # Determine if VGW is tagged as a spoke
-                spoke_vgw = False
-                if vgwTags[config['HUB_TAG']] == config['HUB_TAG_VALUE']:
-                    spoke_vgw = True
+            # Determine if VGW is tagged as a spoke
+            spoke_vgw = False
+            if vgwTags[config['HUB_TAG']] == config['HUB_TAG_VALUE']:
+                spoke_vgw = True
 
-                # Check for VGW Routing Domain Tag
-                spoke_rd = False
-                vgwTags[config['RD_TAG']] = vgwTags.get(config['RD_TAG'], '')
-                if vgwTags[config['RD_TAG']] != '':
-                    spoke_rd = True
+            # Check for VGW Routing Domain Tag
+            spoke_rd = False
+            vgwTags[config['RD_TAG']] = vgwTags.get(config['RD_TAG'], '')
+            if vgwTags[config['RD_TAG']] != '':
+                spoke_rd = True
+            else:
+                log.error('Route Domain Tag is not set on VGW %s!', vgw)
+
+            # Check to see if the VGW already has Transit VPC VPN Connections
+            vpn_existing = False
+            for vpn in vpns['VpnConnections']:
+                if vpn['VpnGatewayId'] == vgw['VpnGatewayId']:
+                    vpn_existing = True
+                    break
+
+            # Need to create VPN connections if this is a spoke VGW and no VPN connections already exist
+            if spoke_vgw and spoke_rd and not vpn_existing:
+                log.info('Found a new VGW (%s) which needs VPN connections.', vgw['VpnGatewayId'])
+                log.info('Contents of vgwTags: %s', vgwTags)
+
+                routecheck = rdcheck(bucket_name, bucket_prefix, config, vgwTags[config['RD_TAG']], rdomain_table)
+                log.info('Route Check %s', routecheck)
+                if routecheck['Value'] == 'NOT_CONFIGURED':
+                    break
+                elif routecheck['Value'] == 'CONFIGURED':
+                    log.info('VGW (%s) has a Routing Domain tag set', vgw['VpnGatewayId'])
+                    # Create Customer Gateways (will create CGWs if they do not exist, otherwise, the API calls are ignored)
+                    log.debug('Creating Customer Gateways with IP %s, %s', config['EIP1'], config['EIP2'])
+                    cg1 = ec2.create_customer_gateway(Type='ipsec.1', PublicIp=config['EIP1'], BgpAsn=config['BGP_ASN'])
+                    ec2.create_tags(Resources=[cg1['CustomerGateway']['CustomerGatewayId']],
+                                    Tags=[{'Key': 'Name', 'Value': 'Transit VPC Endpoint1'}])
+                    cg2 = ec2.create_customer_gateway(Type='ipsec.1', PublicIp=config['EIP2'], BgpAsn=config['BGP_ASN'])
+                    ec2.create_tags(Resources=[cg2['CustomerGateway']['CustomerGatewayId']],
+                                    Tags=[{'Key': 'Name', 'Value': 'Transit VPC Endpoint2'}])
+                    log.info('Created Customer Gateways: %s, %s', cg1['CustomerGateway']['CustomerGatewayId'],
+                             cg2['CustomerGateway']['CustomerGatewayId'])
+
+                    # Create and tag first VPN connection
+                    vpn1 = ec2.create_vpn_connection(Type='ipsec.1',
+                                                     CustomerGatewayId=cg1['CustomerGateway']['CustomerGatewayId'],
+                                                     VpnGatewayId=vgw['VpnGatewayId'],
+                                                     Options={'StaticRoutesOnly': False})
+                    ec2.create_tags(Resources=[vpn1['VpnConnection']['VpnConnectionId']], Tags=[
+                        {'Key': 'Name', 'Value': vgw['VpnGatewayId'] + '-to-Transit-VPC CSR1'},
+                        {'Key': config['HUB_TAG'], 'Value': config['HUB_TAG_VALUE']},
+                        {'Key': 'transitvpc:endpoint', 'Value': 'CSR1'}
+                    ])
+                    # Create and tag second VPN connection
+                    vpn2 = ec2.create_vpn_connection(Type='ipsec.1',
+                                                     CustomerGatewayId=cg2['CustomerGateway']['CustomerGatewayId'],
+                                                     VpnGatewayId=vgw['VpnGatewayId'],
+                                                     Options={'StaticRoutesOnly': False})
+                    ec2.create_tags(Resources=[vpn2['VpnConnection']['VpnConnectionId']],
+                                    Tags=[
+                                        {'Key': 'Name', 'Value': vgw['VpnGatewayId'] + '-to-Transit-VPC CSR2'},
+                                        {'Key': config['HUB_TAG'], 'Value': config['HUB_TAG_VALUE']},
+                                        {'Key': 'transitvpc:endpoint', 'Value': 'CSR2'}
+                                    ])
+                    log.info('Created VPN connections: %s, %s', vpn1['VpnConnection']['VpnConnectionId'],
+                             vpn2['VpnConnection']['VpnConnectionId'])
+
+                    # Retrieve VPN configuration
+                    vpn_config1 = ec2.describe_vpn_connections(
+                        VpnConnectionIds=[vpn1['VpnConnection']['VpnConnectionId']])
+                    vpn_config1 = vpn_config1['VpnConnections'][0]['CustomerGatewayConfiguration']
+                    # Update VPN configuration XML with transit VPC specific configuration info for this connection
+                    vpn_config1 = updateConfigXML(vpn_config1, config, vgwTags, account_id, 'CSR1',routecheck['rd'])
+                    # Put CSR1 config in S3
+                    s3.put_object(
+                        Body=str.encode(vpn_config1),
+                        Bucket=bucket_name,
+                        Key=bucket_prefix + 'CSR1/' + region_id + '-' + vpn1['VpnConnection'][
+                            'VpnConnectionId'] + '.conf',
+                        ACL='bucket-owner-full-control',
+                        ServerSideEncryption='aws:kms',
+                        SSEKMSKeyId=config['KMS_KEY']
+                    )
+                    vpn_config2 = ec2.describe_vpn_connections(
+                        VpnConnectionIds=[vpn2['VpnConnection']['VpnConnectionId']])
+                    vpn_config2 = vpn_config2['VpnConnections'][0]['CustomerGatewayConfiguration']
+                    # Update VPN configuration XML with transit VPC specific configuration info for this connection
+                    vpn_config2 = updateConfigXML(vpn_config2, config, vgwTags, account_id, 'CSR2',routecheck['rd'])
+                    # Put CSR2 config in S3
+                    s3.put_object(
+                        Body=str.encode(vpn_config2),
+                        Bucket=bucket_name,
+                        Key=bucket_prefix + 'CSR2/' + region_id + '-' + vpn2['VpnConnection'][
+                            'VpnConnectionId'] + '.conf',
+                        ACL='bucket-owner-full-control',
+                        ServerSideEncryption='aws:kms',
+                        SSEKMSKeyId=config['KMS_KEY']
+                    )
+                    log.debug('Pushed VPN configurations to S3...')
+                    processed_vgw = True
+                    sendAnonymousData(config, vgwTags, region_id, 2)
                 else:
-                    log.error('Route Domain Tag is not set on VGW %s!', vgw)
+                    break
 
-                # Check to see if the VGW already has Transit VPC VPN Connections
-                vpn_existing = False
+            # Need to delete VPN connections if this is no longer a spoke VPC (tagged for spoke, but tag != spoke tag value) but Transit VPC connections exist
+            if not spoke_vgw and vpn_existing:
+                log.info('Found old VGW (%s) with VPN connections to remove.', vgw['VpnGatewayId'])
+                # We need to go through the region's VPN connections to find the ones to delete
                 for vpn in vpns['VpnConnections']:
                     if vpn['VpnGatewayId'] == vgw['VpnGatewayId']:
-                        vpn_existing = True
-                        break
-
-                # Need to create VPN connections if this is a spoke VGW and no VPN connections already exist
-                if spoke_vgw and spoke_rd and not vpn_existing:
-                    log.info('Found a new VGW (%s) which needs VPN connections.', vgw['VpnGatewayId'])
-                    log.info('Contents of vgwTags: %s', vgwTags)
-
-                    routecheck = rdcheck(bucket_name, bucket_prefix, config, vgwTags[config['RD_TAG']], rdomain_table)
-                    log.info('Route Check %s', routecheck)
-                    if routecheck['Value'] == 'NOT_CONFIGURED':
-                        break
-                    elif routecheck['Value'] == 'CONFIGURED':
-                        log.info('VGW (%s) has a Routing Domain tag set', vgw['VpnGatewayId'])
-                        # Create Customer Gateways (will create CGWs if they do not exist, otherwise, the API calls are ignored)
-                        log.debug('Creating Customer Gateways with IP %s, %s', config['EIP1'], config['EIP2'])
-                        cg1 = ec2.create_customer_gateway(Type='ipsec.1', PublicIp=config['EIP1'], BgpAsn=config['BGP_ASN'])
-                        ec2.create_tags(Resources=[cg1['CustomerGateway']['CustomerGatewayId']],
-                                        Tags=[{'Key': 'Name', 'Value': 'Transit VPC Endpoint1'}])
-                        cg2 = ec2.create_customer_gateway(Type='ipsec.1', PublicIp=config['EIP2'], BgpAsn=config['BGP_ASN'])
-                        ec2.create_tags(Resources=[cg2['CustomerGateway']['CustomerGatewayId']],
-                                        Tags=[{'Key': 'Name', 'Value': 'Transit VPC Endpoint2'}])
-                        log.info('Created Customer Gateways: %s, %s', cg1['CustomerGateway']['CustomerGatewayId'],
-                                 cg2['CustomerGateway']['CustomerGatewayId'])
-
-                        # Create and tag first VPN connection
-                        vpn1 = ec2.create_vpn_connection(Type='ipsec.1',
-                                                         CustomerGatewayId=cg1['CustomerGateway']['CustomerGatewayId'],
-                                                         VpnGatewayId=vgw['VpnGatewayId'],
-                                                         Options={'StaticRoutesOnly': False})
-                        ec2.create_tags(Resources=[vpn1['VpnConnection']['VpnConnectionId']], Tags=[
-                            {'Key': 'Name', 'Value': vgw['VpnGatewayId'] + '-to-Transit-VPC CSR1'},
-                            {'Key': config['HUB_TAG'], 'Value': config['HUB_TAG_VALUE']},
-                            {'Key': 'transitvpc:endpoint', 'Value': 'CSR1'}
-                        ])
-                        # Create and tag second VPN connection
-                        vpn2 = ec2.create_vpn_connection(Type='ipsec.1',
-                                                         CustomerGatewayId=cg2['CustomerGateway']['CustomerGatewayId'],
-                                                         VpnGatewayId=vgw['VpnGatewayId'],
-                                                         Options={'StaticRoutesOnly': False})
-                        ec2.create_tags(Resources=[vpn2['VpnConnection']['VpnConnectionId']],
-                                        Tags=[
-                                            {'Key': 'Name', 'Value': vgw['VpnGatewayId'] + '-to-Transit-VPC CSR2'},
-                                            {'Key': config['HUB_TAG'], 'Value': config['HUB_TAG_VALUE']},
-                                            {'Key': 'transitvpc:endpoint', 'Value': 'CSR2'}
-                                        ])
-                        log.info('Created VPN connections: %s, %s', vpn1['VpnConnection']['VpnConnectionId'],
-                                 vpn2['VpnConnection']['VpnConnectionId'])
-
-                        # Retrieve VPN configuration
-                        vpn_config1 = ec2.describe_vpn_connections(
-                            VpnConnectionIds=[vpn1['VpnConnection']['VpnConnectionId']])
-                        vpn_config1 = vpn_config1['VpnConnections'][0]['CustomerGatewayConfiguration']
+                        # Put the VPN tags into a dict for easier processing
+                        vpnTags = getTags(vpn['Tags'])
+                        if vpnTags['transitvpc:endpoint'] == 'CSR1':
+                            csrNum = '1'
+                        else:
+                            csrNum = '2'
+                        # Need to get VPN configuration to remove from CSR
+                        vpn_config = vpn['CustomerGatewayConfiguration']
+                        # set routedomain value; This value is not needed for the delete process but a properly formatted dict is expected by the updateConfigXml function
+                        routedomain = {'rd_name':vgwTags[config['RD_TAG']],'vrf_asn':'NONE'}
                         # Update VPN configuration XML with transit VPC specific configuration info for this connection
-                        vpn_config1 = updateConfigXML(vpn_config1, config, vgwTags, account_id, 'CSR1',routecheck['rd'])
-                        # Put CSR1 config in S3
+                        vpn_config = updateConfigXML(vpn_config, config, vgwTags, account_id,
+                                                     vpnTags['transitvpc:endpoint'],routedomain)
                         s3.put_object(
-                            Body=str.encode(vpn_config1),
+                            Body=str.encode(vpn_config),
                             Bucket=bucket_name,
-                            Key=bucket_prefix + 'CSR1/' + region_id + '-' + vpn1['VpnConnection'][
+                            Key=bucket_prefix + 'CSR' + csrNum + '/' + region_id + '-' + vpn[
                                 'VpnConnectionId'] + '.conf',
                             ACL='bucket-owner-full-control',
                             ServerSideEncryption='aws:kms',
                             SSEKMSKeyId=config['KMS_KEY']
                         )
-                        vpn_config2 = ec2.describe_vpn_connections(
-                            VpnConnectionIds=[vpn2['VpnConnection']['VpnConnectionId']])
-                        vpn_config2 = vpn_config2['VpnConnections'][0]['CustomerGatewayConfiguration']
-                        # Update VPN configuration XML with transit VPC specific configuration info for this connection
-                        vpn_config2 = updateConfigXML(vpn_config2, config, vgwTags, account_id, 'CSR2',routecheck['rd'])
-                        # Put CSR2 config in S3
-                        s3.put_object(
-                            Body=str.encode(vpn_config2),
-                            Bucket=bucket_name,
-                            Key=bucket_prefix + 'CSR2/' + region_id + '-' + vpn2['VpnConnection'][
-                                'VpnConnectionId'] + '.conf',
-                            ACL='bucket-owner-full-control',
-                            ServerSideEncryption='aws:kms',
-                            SSEKMSKeyId=config['KMS_KEY']
-                        )
-                        log.debug('Pushed VPN configurations to S3...')
-                        processed_vgw = True
-                        sendAnonymousData(config, vgwTags, region_id, 2)
-                    else:
-                        break
+                        log.debug('Pushed CSR%s configuration to S3.', csrNum)
+                        # now we need to delete the VPN connection
+                        ec2.delete_vpn_connection(VpnConnectionId=vpn['VpnConnectionId'])
+                        log.info('Deleted VPN connection (%s) to CSR%s', vpn['VpnConnectionId'], csrNum)
+                        # Attempt to clean up the CGW. This will only succeed if the CGW has no VPN connections are deleted
+                        try:
+                            ec2.delete_customer_gateway(CustomerGatewayId=vpn['CustomerGatewayId'])
+                            log.info("Cleaned up %s since it has no VPN connections left", vpn['CustomerGatewayId'])
+                        except:
+                            log.debug("%s still has existing VPN connections", vpn['CustomerGatewayId'])
+                        sendAnonymousData(config, vgwTags, region_id, 1)
 
-                # Need to delete VPN connections if this is no longer a spoke VPC (tagged for spoke, but tag != spoke tag value) but Transit VPC connections exist
-                if not spoke_vgw and vpn_existing:
-                    log.info('Found old VGW (%s) with VPN connections to remove.', vgw['VpnGatewayId'])
-                    # We need to go through the region's VPN connections to find the ones to delete
-                    for vpn in vpns['VpnConnections']:
-                        if vpn['VpnGatewayId'] == vgw['VpnGatewayId']:
-                            # Put the VPN tags into a dict for easier processing
-                            vpnTags = getTags(vpn['Tags'])
-                            if vpnTags['transitvpc:endpoint'] == 'CSR1':
-                                csrNum = '1'
-                            else:
-                                csrNum = '2'
-                            # Need to get VPN configuration to remove from CSR
-                            vpn_config = vpn['CustomerGatewayConfiguration']
-                            # set routedomain value; This value is not needed for the delete process but a properly formatted dict is expected by the updateConfigXml function
-                            routedomain = {'rd_name':vgwTags[config['RD_TAG']],'vrf_asn':'NONE'}
-                            # Update VPN configuration XML with transit VPC specific configuration info for this connection
-                            vpn_config = updateConfigXML(vpn_config, config, vgwTags, account_id,
-                                                         vpnTags['transitvpc:endpoint'],routedomain)
-                            s3.put_object(
-                                Body=str.encode(vpn_config),
-                                Bucket=bucket_name,
-                                Key=bucket_prefix + 'CSR' + csrNum + '/' + region_id + '-' + vpn[
-                                    'VpnConnectionId'] + '.conf',
-                                ACL='bucket-owner-full-control',
-                                ServerSideEncryption='aws:kms',
-                                SSEKMSKeyId=config['KMS_KEY']
-                            )
-                            log.debug('Pushed CSR%s configuration to S3.', csrNum)
-                            # now we need to delete the VPN connection
-                            ec2.delete_vpn_connection(VpnConnectionId=vpn['VpnConnectionId'])
-                            log.info('Deleted VPN connection (%s) to CSR%s', vpn['VpnConnectionId'], csrNum)
-                            # Attempt to clean up the CGW. This will only succeed if the CGW has no VPN connections are deleted
-                            try:
-                                ec2.delete_customer_gateway(CustomerGatewayId=vpn['CustomerGatewayId'])
-                                log.info("Cleaned up %s since it has no VPN connections left", vpn['CustomerGatewayId'])
-                            except:
-                                log.debug("%s still has existing VPN connections", vpn['CustomerGatewayId'])
-                            sendAnonymousData(config, vgwTags, region_id, 1)
-
-                # if a VGW has been processed, then we need to break out of VGW processing
-                if processed_vgw:
-                    break
-            # if a VGW has been processed, then we need to break out of region processing
+            # if a VGW has been processed, then we need to break out of VGW processing
             if processed_vgw:
                 break
+        # if a VGW has been processed, then we need to break out of region processing
+        if processed_vgw:
+            break
+
+
+def lambda_handler(event, context):
+    log.info("Lambda Event %s", event)
+
+    if 'Invokedata' not in event:
+        # Get list of Accounts
+        accounts = account_id_list()
+        for acct in accounts:
+            invokedata = {'Invokedata': {'Account': acct}}
+            try:
+                boto3.client('lambda').invoke(FunctionName=context.invoked_function_arn, InvocationType='Event',
+                                              Payload=json.dumps(invokedata))
+            except ClientError as err:
+                log.error("%s",err)
+    else:
+        log.info("Processing Account %s", event['Invokedata']['Account'])
+        if event['Invokedata']['Account'] == '228198000189':
+            vgw_poller(event['Invokedata']['Account'],context)
+
+
+

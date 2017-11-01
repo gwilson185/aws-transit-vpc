@@ -319,7 +319,7 @@
         "Name": "vgw-poller",
         "Description": "Transit VPC: Poller function responsible for identifying specifically tagged VGWs and creating VPN connections to transit VPC.",
         "Runtime": "python2.7",
-        "Timeout": "120",
+        "Timeout": "300",
         "MemorySize": "128"
       },
       "PeeringManager": {
@@ -361,6 +361,10 @@
        "ProductionMgmt": {
         "Name" : "production-mgmt",
         "RDNum": "103"
+      },
+       "EdcCorp": {
+        "Name" : "entrustdatacard-corporate",
+        "RDNum": "104"
       }
     },
     "VPN": {
@@ -379,24 +383,6 @@
         "CsrTunnelIp": "10.251.1.134",
         "CsrTunnelIpMask" : "255.255.255.252",
         "EdcTunnelIp": "10.251.1.133",
-        "EdcTunnelIpMask": "255.255.255.252",
-        "EdcBgpAsn": "65000"
-      },
-      "EdcDcxMgmtCsr1": {
-        "EndPointIp": "10.0.252.18",
-        "PreSharedKey": "0Qp8RswnEmDxlaCurwiL2VJS",
-        "CsrTunnelIp": "10.251.1.130",
-        "CsrTunnelIpMask" : "255.255.255.252",
-        "EdcTunnelIp": "10.251.1.129",
-        "EdcTunnelIpMask": "255.255.255.252",
-        "EdcBgpAsn": "65000"
-      },
-      "EdcDcxMgmtCsr2": {
-        "EndPointIp": "10.0.252.18",
-        "PreSharedKey": "0Qp8RswnEmDxlaCurwiL2VJS",
-        "CsrTunnelIp": "10.251.1.138",
-        "CsrTunnelIpMask" : "255.255.255.252",
-        "EdcTunnelIp": "10.251.1.137",
         "EdcTunnelIpMask": "255.255.255.252",
         "EdcBgpAsn": "65000"
       },
@@ -692,6 +678,12 @@
                   {
                     "Fn::GetAtt": [
                       "TransitVpcPollerRole",
+                      "Arn"
+                    ]
+                  },
+                  {
+                    "Fn::GetAtt": [
+                      "TransitVpcPeeringRole",
                       "Arn"
                     ]
                   }
@@ -1093,68 +1085,88 @@
                 "ios-config-2=\"service password-encryption\"\n",
                 "ios-config-3=\"crypto isakmp policy 200\"\n",
                 "ios-config-4=\"encryption aes 256\"\n",
-                "ios-config-5=\"authentication pre-share\"\n",
-                "ios-config-6=\"group 2\"\n",
-                "ios-config-7=\"lifetime 28800\"\n",
-                "ios-config-8=\"hash sha\"\n",
-                "ios-config-9=\"crypto isakmp policy 300\"\n",
-                "ios-config-10=\"encryption aes 128\"\n",
-                "ios-config-11=\"authentication pre-share\"\n",
-                "ios-config-12=\"group 2\"\n",
-                "ios-config-13=\"lifetime 28800\"\n",
-                "ios-config-14=\"hash sha\"\n",
-                "ios-config-15=\"crypto ipsec transform-set ipsec-prop-vpn-aws esp-aes 128 esp-sha256-hmac\"\n",
-                "ios-config-16=\"mode tunnel\"\n",
-                "ios-config-17=\"crypto ipsec df-bit clear\"\n",
-                "ios-config-18=\"crypto isakmp keepalive 15 10 on-demand\"\n",
-                "ios-config-19=\"crypto ipsec security-association replay window-size 1024\"\n",
-                "ios-config-20=\"crypto ipsec fragmentation before-encryption\"\n",
-                "ios-config-21=\"crypto ipsec profile ipsec-vpn-aws\"\n",
-                "ios-config-22=\"set pfs group2\"\n",
-                "ios-config-23=\"set security-association lifetime seconds 3600\"\n",
-                "ios-config-24=\"set transform-set ipsec-prop-vpn-aws\"\n",
-                "ios-config-25=\"crypto ipsec profile ipsec-vpn-edc\"\n",
-                "ios-config-26=\"set pfs group2\"\n",
-                "ios-config-27=\"set security-association lifetime seconds 3600\"\n",
-                "ios-config-28=\"set transform-set ipsec-prop-vpn-edc\"\n",
-                "ios-config-29=\"ip vrf ",{"Fn::FindInMap":["RouteDomains","Development","Name"]},"\"\n",
-                "ios-config-30=\"rd ",
+                "ios-config-5=\"hash sha256\"\n",
+                "ios-config-6=\"authentication pre-share\"\n",
+                "ios-config-7=\"group 2\"\n",
+                "ios-config-8=\"lifetime 28800\"\n",
+                "ios-config-9=\"hash sha256\"\n",
+                "ios-config-10=\"crypto isakmp policy 300\"\n",
+                "ios-config-11=\"encryption aes 128\"\n",
+                "ios-config-12=\"authentication pre-share\"\n",
+                "ios-config-13=\"group 2\"\n",
+                "ios-config-14=\"lifetime 28800\"\n",
+                "ios-config-15=\"hash sha\"\n",
+                "ios-config-16=\"crypto ipsec transform-set ipsec-prop-vpn-aws esp-aes 128 esp-sha256-hmac\"\n",
+                "ios-config-17=\"mode tunnel\"\n",
+                "ios-config-18=\"crypto ipsec df-bit clear\"\n",
+                "ios-config-19=\"crypto isakmp keepalive 15 10 on-demand\"\n",
+                "ios-config-20=\"crypto ipsec security-association replay window-size 1024\"\n",
+                "ios-config-21=\"crypto ipsec fragmentation before-encryption\"\n",
+                "ios-config-22=\"crypto ipsec profile ipsec-vpn-aws\"\n",
+                "ios-config-23=\"set pfs group2\"\n",
+                "ios-config-24=\"set security-association lifetime seconds 3600\"\n",
+                "ios-config-25=\"set transform-set ipsec-prop-vpn-aws\"\n",
+                "ios-config-26=\"crypto ipsec profile ipsec-vpn-edc\"\n",
+                "ios-config-27=\"set pfs group2\"\n",
+                "ios-config-28=\"set security-association lifetime seconds 3600\"\n",
+                "ios-config-29=\"set transform-set ipsec-prop-vpn-edc\"\n",
+                "ios-config-30=\"ip prefix-list no-aggregate seq 10 deny 10.0.0.0\/8\"\n",
+                "ios-config-31=\"ip prefix-list no-aggregate seq 20 deny 172.16.0.0\/12\"\n",
+                "ios-config-32=\"ip prefix-list no-aggregate seq 30 deny 192.168.0.0\/16\"\n",
+                "ios-config-33=\"ip prefix-list no-aggregate seq 40 permit 0.0.0.0\/0 le 32\"\n",
+                "ios-config-34=\"route-map rm-localpref permit 10\"\n",
+                "ios-config-35=\"set local-preference 300\"\n",
+                "ios-config-36=\"exit\"\n",
+                "ios-config-37=\"route-map rm-prepend permit 10\"\n",
+                "ios-config-38=\"set as-path prepend ",{"Ref": "BgpAsn"}," ",{"Ref": "BgpAsn"},"\"\n",
+                "ios-config-39=\"exit\"\n",
+                "ios-config-40=\"route-map rm-vrfimport permit 10\"\n",
+                "ios-config-41=\"match ip address prefix-list no-aggregate\"\n",
+                "ios-config-42=\"exit\"\n",
+                "ios-config-43=\"ip vrf ",{"Fn::FindInMap":["RouteDomains","Development","Name"]},"\"\n",
+                "ios-config-44=\"rd ",
                 {
                   "Ref": "BgpAsn"
                 },
                 ":",{"Fn::FindInMap":["RouteDomains","Development","RDNum"]},"\"\n",
-                "ios-config-31=\"ip vrf ",{"Fn::FindInMap":["RouteDomains","DevelopmentMgmt","Name"]},"\"\n",
-                "ios-config-32=\"rd ",
+                "ios-config-45=\"ip vrf ",{"Fn::FindInMap":["RouteDomains","DevelopmentMgmt","Name"]},"\"\n",
+                "ios-config-46=\"rd ",
                 {
                   "Ref": "BgpAsn"
                 },
                 ":",{"Fn::FindInMap":["RouteDomains","DevelopmentMgmt","RDNum"]},"\"\n",
-                "ios-config-33=\"ip vrf ",{"Fn::FindInMap":["RouteDomains","Production","Name"]},"\"\n",
-                "ios-config-34=\"rd ",
+                "ios-config-47=\"ip vrf ",{"Fn::FindInMap":["RouteDomains","Production","Name"]},"\"\n",
+                "ios-config-48=\"rd ",
                 {
                   "Ref": "BgpAsn"
                 },
                 ":",{"Fn::FindInMap":["RouteDomains","Production","RDNum"]},"\"\n",
-                "ios-config-35=\"ip vrf ",{"Fn::FindInMap":["RouteDomains","ProductionMgmt","Name"]},"\"\n",
-                "ios-config-36=\"rd ",
+                "ios-config-49=\"ip vrf ",{"Fn::FindInMap":["RouteDomains","ProductionMgmt","Name"]},"\"\n",
+                "ios-config-50=\"rd ",
                 {
                   "Ref": "BgpAsn"
                 },
                 ":",{"Fn::FindInMap":["RouteDomains","ProductionMgmt","RDNum"]},"\"\n",
-                "ios-config-37=\"router bgp ",
+                "ios-config-51=\"ip vrf ",{"Fn::FindInMap":["RouteDomains","EdcCorp","Name"]},"\"\n",
+                "ios-config-52=\"rd ",
+                {
+                  "Ref": "BgpAsn"
+                },
+                ":",{"Fn::FindInMap":["RouteDomains","EdcCorp","RDNum"]},"\"\n",
+                "ios-config-53=\"router bgp ",
                 {
                   "Ref": "BgpAsn"
                 },
                 "\"\n",
-                "ios-config-38=\"bgp log-neighbor-changes\"\n",
-                "ios-config-39=\"ip vrf vpn0\"\n",
-                "ios-config-40=\"rd ",
+                "ios-config-54=\"bgp log-neighbor-changes\"\n",
+                "ios-config-55=\"ip vrf vpn0\"\n",
+                "ios-config-56=\"rd ",
                 {
                   "Ref": "BgpAsn"
                 },
                 ":0\"\n",
-                "ios-config-41=\"ip ssh pubkey-chain\"\n",
-                "ios-config-42=\"username ",
+                "ios-config-57=\"ip ssh pubkey-chain\"\n",
+                "ios-config-58=\"username ",
                 {
                   "Fn::FindInMap": [
                     "Function",
@@ -1163,7 +1175,7 @@
                   ]
                 },
                 "\"\n",
-                "ios-config-43=\"key-hash ssh-rsa ",
+                "ios-config-59=\"key-hash ssh-rsa ",
                 {
                   "Fn::GetAtt": [
                     "CreateRsaKey",
@@ -1171,8 +1183,8 @@
                   ]
                 },
                 "\"\n",
-                "ios-config-44=\"ip ssh server algorithm authentication publickey\"\n",
-                "ios-config-45=\"ip ssh maxstartups 1\"\n"
+                "ios-config-60=\"ip ssh server algorithm authentication publickey\"\n",
+                "ios-config-61=\"ip ssh maxstartups 1\"\n"
               ]
             ]
           }
@@ -1254,68 +1266,88 @@
                 "ios-config-2=\"service password-encryption\"\n",
                 "ios-config-3=\"crypto isakmp policy 200\"\n",
                 "ios-config-4=\"encryption aes 256\"\n",
-                "ios-config-5=\"authentication pre-share\"\n",
-                "ios-config-6=\"group 2\"\n",
-                "ios-config-7=\"lifetime 28800\"\n",
-                "ios-config-8=\"hash sha\"\n",
-                "ios-config-9=\"crypto isakmp policy 300\"\n",
-                "ios-config-10=\"encryption aes 128\"\n",
-                "ios-config-11=\"authentication pre-share\"\n",
-                "ios-config-12=\"group 2\"\n",
-                "ios-config-13=\"lifetime 28800\"\n",
-                "ios-config-14=\"hash sha\"\n",
-                "ios-config-15=\"crypto ipsec transform-set ipsec-prop-vpn-aws esp-aes 128 esp-sha256-hmac\"\n",
-                "ios-config-16=\"mode tunnel\"\n",
-                "ios-config-17=\"crypto ipsec df-bit clear\"\n",
-                "ios-config-18=\"crypto isakmp keepalive 15 10 on-demand\"\n",
-                "ios-config-19=\"crypto ipsec security-association replay window-size 1024\"\n",
-                "ios-config-20=\"crypto ipsec fragmentation before-encryption\"\n",
-                "ios-config-21=\"crypto ipsec profile ipsec-vpn-aws\"\n",
-                "ios-config-22=\"set pfs group2\"\n",
-                "ios-config-23=\"set security-association lifetime seconds 3600\"\n",
-                "ios-config-24=\"set transform-set ipsec-prop-vpn-aws\"\n",
-                "ios-config-25=\"crypto ipsec profile ipsec-vpn-edc\"\n",
-                "ios-config-26=\"set pfs group2\"\n",
-                "ios-config-27=\"set security-association lifetime seconds 3600\"\n",
-                "ios-config-28=\"set transform-set ipsec-prop-vpn-edc\"\n",
-                "ios-config-29=\"ip vrf ",{"Fn::FindInMap":["RouteDomains","Development","Name"]},"\"\n",
-                "ios-config-30=\"rd ",
+                "ios-config-5=\"hash sha256\"\n",
+                "ios-config-6=\"authentication pre-share\"\n",
+                "ios-config-7=\"group 2\"\n",
+                "ios-config-8=\"lifetime 28800\"\n",
+                "ios-config-9=\"hash sha256\"\n",
+                "ios-config-10=\"crypto isakmp policy 300\"\n",
+                "ios-config-11=\"encryption aes 128\"\n",
+                "ios-config-12=\"authentication pre-share\"\n",
+                "ios-config-13=\"group 2\"\n",
+                "ios-config-14=\"lifetime 28800\"\n",
+                "ios-config-15=\"hash sha\"\n",
+                "ios-config-16=\"crypto ipsec transform-set ipsec-prop-vpn-aws esp-aes 128 esp-sha256-hmac\"\n",
+                "ios-config-17=\"mode tunnel\"\n",
+                "ios-config-18=\"crypto ipsec df-bit clear\"\n",
+                "ios-config-19=\"crypto isakmp keepalive 15 10 on-demand\"\n",
+                "ios-config-20=\"crypto ipsec security-association replay window-size 1024\"\n",
+                "ios-config-21=\"crypto ipsec fragmentation before-encryption\"\n",
+                "ios-config-22=\"crypto ipsec profile ipsec-vpn-aws\"\n",
+                "ios-config-23=\"set pfs group2\"\n",
+                "ios-config-24=\"set security-association lifetime seconds 3600\"\n",
+                "ios-config-25=\"set transform-set ipsec-prop-vpn-aws\"\n",
+                "ios-config-26=\"crypto ipsec profile ipsec-vpn-edc\"\n",
+                "ios-config-27=\"set pfs group2\"\n",
+                "ios-config-28=\"set security-association lifetime seconds 3600\"\n",
+                "ios-config-29=\"set transform-set ipsec-prop-vpn-edc\"\n",
+                "ios-config-30=\"ip prefix-list no-aggregate seq 10 deny 10.0.0.0\/8\"\n",
+                "ios-config-31=\"ip prefix-list no-aggregate seq 20 deny 172.16.0.0\/12\"\n",
+                "ios-config-32=\"ip prefix-list no-aggregate seq 30 deny 192.168.0.0\/16\"\n",
+                "ios-config-33=\"ip prefix-list no-aggregate seq 40 permit 0.0.0.0\/0 le 32\"\n",
+                "ios-config-34=\"route-map rm-localpref permit 10\"\n",
+                "ios-config-35=\"set local-preference 300\"\n",
+                "ios-config-36=\"exit\"\n",
+                "ios-config-37=\"route-map rm-prepend permit 10\"\n",
+                "ios-config-38=\"set as-path prepend ",{"Ref": "BgpAsn"}," ",{"Ref": "BgpAsn"},"\"\n",
+                "ios-config-39=\"exit\"\n",
+                "ios-config-40=\"route-map rm-vrfimport permit 10\"\n",
+                "ios-config-41=\"match ip address prefix-list no-aggregate\"\n",
+                "ios-config-42=\"exit\"\n",
+                "ios-config-43=\"ip vrf ",{"Fn::FindInMap":["RouteDomains","Development","Name"]},"\"\n",
+                "ios-config-44=\"rd ",
                 {
                   "Ref": "BgpAsn"
                 },
                 ":",{"Fn::FindInMap":["RouteDomains","Development","RDNum"]},"\"\n",
-                "ios-config-31=\"ip vrf ",{"Fn::FindInMap":["RouteDomains","DevelopmentMgmt","Name"]},"\"\n",
-                "ios-config-32=\"rd ",
+                "ios-config-45=\"ip vrf ",{"Fn::FindInMap":["RouteDomains","DevelopmentMgmt","Name"]},"\"\n",
+                "ios-config-46=\"rd ",
                 {
                   "Ref": "BgpAsn"
                 },
                 ":",{"Fn::FindInMap":["RouteDomains","DevelopmentMgmt","RDNum"]},"\"\n",
-                "ios-config-33=\"ip vrf ",{"Fn::FindInMap":["RouteDomains","Production","Name"]},"\"\n",
-                "ios-config-34=\"rd ",
+                "ios-config-47=\"ip vrf ",{"Fn::FindInMap":["RouteDomains","Production","Name"]},"\"\n",
+                "ios-config-48=\"rd ",
                 {
                   "Ref": "BgpAsn"
                 },
                 ":",{"Fn::FindInMap":["RouteDomains","Production","RDNum"]},"\"\n",
-                "ios-config-35=\"ip vrf ",{"Fn::FindInMap":["RouteDomains","ProductionMgmt","Name"]},"\"\n",
-                "ios-config-36=\"rd ",
+                "ios-config-49=\"ip vrf ",{"Fn::FindInMap":["RouteDomains","ProductionMgmt","Name"]},"\"\n",
+                "ios-config-50=\"rd ",
                 {
                   "Ref": "BgpAsn"
                 },
                 ":",{"Fn::FindInMap":["RouteDomains","ProductionMgmt","RDNum"]},"\"\n",
-                "ios-config-37=\"router bgp ",
+                "ios-config-51=\"ip vrf ",{"Fn::FindInMap":["RouteDomains","EdcCorp","Name"]},"\"\n",
+                "ios-config-52=\"rd ",
+                {
+                  "Ref": "BgpAsn"
+                },
+                ":",{"Fn::FindInMap":["RouteDomains","EdcCorp","RDNum"]},"\"\n",
+                "ios-config-53=\"router bgp ",
                 {
                   "Ref": "BgpAsn"
                 },
                 "\"\n",
-                "ios-config-38=\"bgp log-neighbor-changes\"\n",
-                "ios-config-39=\"ip vrf vpn0\"\n",
-                "ios-config-40=\"rd ",
+                "ios-config-54=\"bgp log-neighbor-changes\"\n",
+                "ios-config-55=\"ip vrf vpn0\"\n",
+                "ios-config-56=\"rd ",
                 {
                   "Ref": "BgpAsn"
                 },
                 ":0\"\n",
-                "ios-config-41=\"ip ssh pubkey-chain\"\n",
-                "ios-config-42=\"username ",
+                "ios-config-57=\"ip ssh pubkey-chain\"\n",
+                "ios-config-58=\"username ",
                 {
                   "Fn::FindInMap": [
                     "Function",
@@ -1324,7 +1356,7 @@
                   ]
                 },
                 "\"\n",
-                "ios-config-43=\"key-hash ssh-rsa ",
+                "ios-config-59=\"key-hash ssh-rsa ",
                 {
                   "Fn::GetAtt": [
                     "CreateRsaKey",
@@ -1332,8 +1364,8 @@
                   ]
                 },
                 "\"\n",
-                "ios-config-44=\"ip ssh server algorithm authentication publickey\"\n",
-                "ios-config-45=\"ip ssh maxstartups 1\"\n"
+                "ios-config-60=\"ip ssh server algorithm authentication publickey\"\n",
+                "ios-config-61=\"ip ssh maxstartups 1\"\n"
               ]
             ]
           }
@@ -1479,6 +1511,12 @@
                 {
                   "Fn::GetAtt": [
                     "TransitVpcPollerRole",
+                    "Arn"
+                  ]
+                },
+                {
+                  "Fn::GetAtt": [
+                    "TransitVpcPeeringRole",
                     "Arn"
                   ]
                 },
@@ -2081,7 +2119,7 @@
                 "Ref": "S3Prefix"
               },
               "CSR1/",
-              "edc-dev-vpn.conf', ",
+              "edc-corp-dcx-vpn.conf', ",
               "'SSEKMSKeyId' : 'arn:aws:kms:",
               {
                 "Ref": "AWS::Region"
@@ -2096,7 +2134,7 @@
               },
               "', ",
               "'Body': '",
-              "<?xml version=\"1.0\" ?><vpn_connection id=\"edc-dcx-dev\">",
+              "<?xml version=\"1.0\" ?><vpn_connection id=\"edc-corp-dcx-vpn\">",
   "<customer_gateway_id>transit-csr1</customer_gateway_id>",
   "<vpn_gateway_id>edc-dcx-endpoint</vpn_gateway_id>",
   "<vpn_connection_type>ipsec.1</vpn_connection_type>",
@@ -2112,19 +2150,19 @@
     "<ipsec><protocol>esp</protocol><authentication_protocol>hmac-sha256-96</authentication_protocol><encryption_protocol>aes-256-cbc</encryption_protocol><lifetime>3600</lifetime><perfect_forward_secrecy>group2</perfect_forward_secrecy><mode>tunnel</mode><clear_df_bit>true</clear_df_bit><fragmentation_before_encryption>true</fragmentation_before_encryption><tcp_mss_adjustment>1379</tcp_mss_adjustment>",
       "<dead_peer_detection><interval>10</interval><retries>3</retries></dead_peer_detection>",
     "</ipsec></ipsec_tunnel>",
-              "<ipsec_tunnel>",
+"<ipsec_tunnel>",
     "<customer_gateway><tunnel_outside_address><ip_address>",{"Fn::FindInMap": ["CsrInstance","CSR1","IPAddress"]},"</ip_address></tunnel_outside_address>",
       "<tunnel_inside_address><ip_address>",{"Fn::FindInMap": ["VPN","EdcBakupCsr1","CsrTunnelIp"]},"</ip_address><network_mask>",{"Fn::FindInMap": ["VPN","EdcBakupCsr1","CsrTunnelIpMask"]},"</network_mask><network_cidr>30</network_cidr></tunnel_inside_address>",
       "<bgp><asn>",{"Ref":"BgpAsn"},"</asn><hold_time>30</hold_time></bgp>",
     "</customer_gateway><vpn_gateway><tunnel_outside_address><ip_address>",{"Fn::FindInMap": ["VPN","EdcBakupCsr1","EndPointIp"]},"</ip_address></tunnel_outside_address>",
       "<tunnel_inside_address><ip_address>",{"Fn::FindInMap": ["VPN","EdcBakupCsr1","EdcTunnelIp"]},"</ip_address><network_mask>",{"Fn::FindInMap": ["VPN","EdcBakupCsr1","EdcTunnelIpMask"]},"</network_mask><network_cidr>30</network_cidr></tunnel_inside_address>",
-      "<bgp><asn>",{"Fn::FindInMap": ["VPN","EdcDcxMgmtCsr1","EdcBgpAsn"]},"</asn><hold_time>30</hold_time></bgp>",
+      "<bgp><asn>",{"Fn::FindInMap": ["VPN","EdcBakupCsr1","EdcBgpAsn"]},"</asn><hold_time>30</hold_time></bgp>",
     "</vpn_gateway>",
     "<ike><authentication_protocol>sha256</authentication_protocol><encryption_protocol>aes-256-cbc</encryption_protocol><lifetime>28800</lifetime><perfect_forward_secrecy>group2</perfect_forward_secrecy><mode>main</mode><pre_shared_key>",{"Fn::FindInMap": ["VPN","EdcBakupCsr1","PreSharedKey"]},"</pre_shared_key></ike>",
     "<ipsec><protocol>esp</protocol><authentication_protocol>hmac-sha256-96</authentication_protocol><encryption_protocol>aes-256-cbc</encryption_protocol><lifetime>3600</lifetime><perfect_forward_secrecy>group2</perfect_forward_secrecy><mode>tunnel</mode><clear_df_bit>true</clear_df_bit><fragmentation_before_encryption>true</fragmentation_before_encryption><tcp_mss_adjustment>1379</tcp_mss_adjustment>",
       "<dead_peer_detection><interval>10</interval><retries>3</retries></dead_peer_detection>",
     "</ipsec></ipsec_tunnel>",
-  "<transit_vpc_config><account_id>228198000189</account_id><vpn_endpoint>CSR1</vpn_endpoint><status>create</status><preferred_path>none</preferred_path><route_domain>",{"Fn::FindInMap": ["RouteDomains","Development","Name"]},"</route_domain><domain_asn>",{"Ref": "BgpAsn"},":",{"Fn::FindInMap": ["RouteDomains","Development","RDNum"]},"</domain_asn></transit_vpc_config></vpn_connection>",
+  "<transit_vpc_config><account_id>228198000189</account_id><vpn_endpoint>CSR1</vpn_endpoint><status>create</status><preferred_path>none</preferred_path><route_domain>",{"Fn::FindInMap": ["RouteDomains","EdcCorp","Name"]},"</route_domain><domain_asn>",{"Ref": "BgpAsn"},":",{"Fn::FindInMap": ["RouteDomains","EdcCorp","RDNum"]},"</domain_asn></transit_vpc_config></vpn_connection>",
               "'",
               "}]"
             ]
@@ -2156,7 +2194,7 @@
                 "Ref": "S3Prefix"
               },
               "CSR2/",
-              "edc-dev-vpn.conf', ",
+              "edc-corp-dcx-vpn.conf', ",
               "'SSEKMSKeyId' : 'arn:aws:kms:",
               {
                 "Ref": "AWS::Region"
@@ -2171,8 +2209,8 @@
               },
               "', ",
               "'Body': '",
-              "<?xml version=\"1.0\" ?><vpn_connection id=\"edc-dcx-dev\">",
-  "<customer_gateway_id>transit-csr1</customer_gateway_id>",
+              "<?xml version=\"1.0\" ?><vpn_connection id=\"edc-corp-dcx-vpn\">",
+  "<customer_gateway_id>transit-csr2</customer_gateway_id>",
   "<vpn_gateway_id>edc-dcx-endpoint</vpn_gateway_id>",
   "<vpn_connection_type>ipsec.1</vpn_connection_type>",
   "<ipsec_tunnel>",
@@ -2199,7 +2237,7 @@
     "<ipsec><protocol>esp</protocol><authentication_protocol>hmac-sha256-96</authentication_protocol><encryption_protocol>aes-256-cbc</encryption_protocol><lifetime>3600</lifetime><perfect_forward_secrecy>group2</perfect_forward_secrecy><mode>tunnel</mode><clear_df_bit>true</clear_df_bit><fragmentation_before_encryption>true</fragmentation_before_encryption><tcp_mss_adjustment>1379</tcp_mss_adjustment>",
       "<dead_peer_detection><interval>10</interval><retries>3</retries></dead_peer_detection>",
     "</ipsec></ipsec_tunnel>",
-  "<transit_vpc_config><account_id>228198000189</account_id><vpn_endpoint>CSR1</vpn_endpoint><status>create</status><preferred_path>none</preferred_path><route_domain>",{"Fn::FindInMap": ["RouteDomains","Development","Name"]},"</route_domain><domain_asn>",{"Ref": "BgpAsn"},":",{"Fn::FindInMap": ["RouteDomains","Development","RDNum"]},"</domain_asn></transit_vpc_config></vpn_connection>",
+  "<transit_vpc_config><account_id>228198000189</account_id><vpn_endpoint>CSR1</vpn_endpoint><status>create</status><preferred_path>none</preferred_path><route_domain>",{"Fn::FindInMap": ["RouteDomains","EdcCorp","Name"]},"</route_domain><domain_asn>",{"Ref": "BgpAsn"},":",{"Fn::FindInMap": ["RouteDomains","EdcCorp","RDNum"]},"</domain_asn></transit_vpc_config></vpn_connection>",
               "'",
               "}]"
             ]
@@ -2219,7 +2257,7 @@
         "StoreInDDB": {
           "Fn::Join" : [ "",[
           "{'TableName': '",{"Ref": "RouteDomainList"},"',",
-          "'Item': {'rd_name': {'S':'",{"Fn::FindInMap": ["RouteDomains","Development","Name"]},"'},'vrf_asn':{'S':'",{"Ref": "BgpAsn"},":",{"Fn::FindInMap": ["RouteDomains","Development","RDNum"]},"'}}}"]]}
+          "'Item': {'rd_name': {'S':'",{"Fn::FindInMap": ["RouteDomains","Development","Name"]},"'},'Peers':{'SS':['",{"Fn::FindInMap": ["RouteDomains","EdcCorp","Name"]},"','",{"Fn::FindInMap": ["RouteDomains","DevelopmentMgmt","Name"]},"']},'vrf_asn':{'S':'",{"Ref": "BgpAsn"},":",{"Fn::FindInMap": ["RouteDomains","Development","RDNum"]},"'}}}"]]}
         }
       },
     "DevMgmtRouteDomain": {
@@ -2234,7 +2272,7 @@
         "StoreInDDB": {
           "Fn::Join" : [ "",[
           "{'TableName': '",{"Ref": "RouteDomainList"},"',",
-          "'Item': {'rd_name': {'S':'",{"Fn::FindInMap": ["RouteDomains","DevelopmentMgmt","Name"]},"'},'vrf_asn':{'S':'",{"Ref": "BgpAsn"},":",{"Fn::FindInMap": ["RouteDomains","DevelopmentMgmt","RDNum"]},"'}}}"]]}
+          "'Item': {'rd_name': {'S':'",{"Fn::FindInMap": ["RouteDomains","DevelopmentMgmt","Name"]},"'},'Peers':{'SS':['",{"Fn::FindInMap": ["RouteDomains","EdcCorp","Name"]},"','",{"Fn::FindInMap": ["RouteDomains","Development","Name"]},"']},'vrf_asn':{'S':'",{"Ref": "BgpAsn"},":",{"Fn::FindInMap": ["RouteDomains","DevelopmentMgmt","RDNum"]},"'}}}"]]}
         }
       },
     "ProdRouteDomain": {
@@ -2249,7 +2287,7 @@
         "StoreInDDB": {
           "Fn::Join" : [ "",[
           "{'TableName': '",{"Ref": "RouteDomainList"},"',",
-          "'Item': {'rd_name': {'S':'",{"Fn::FindInMap": ["RouteDomains","Production","Name"]},"'},'vrf_asn':{'S':'",{"Ref": "BgpAsn"},":",{"Fn::FindInMap": ["RouteDomains","Production","RDNum"]},"'}}}"]]}
+          "'Item': {'rd_name': {'S':'",{"Fn::FindInMap": ["RouteDomains","Production","Name"]},"'},'Peers':{'SS':['",{"Fn::FindInMap": ["RouteDomains","ProductionMgmt","Name"]},"']},'vrf_asn':{'S':'",{"Ref": "BgpAsn"},":",{"Fn::FindInMap": ["RouteDomains","Production","RDNum"]},"'}}}"]]}
         }
       },
     "ProdMgmtRouteDomain": {
@@ -2264,7 +2302,22 @@
         "StoreInDDB": {
           "Fn::Join" : [ "",[
           "{'TableName': '",{"Ref": "RouteDomainList"},"',",
-          "'Item': {'rd_name': {'S':'",{"Fn::FindInMap": ["RouteDomains","ProductionMgmt","Name"]},"'},'vrf_asn':{'S':'",{"Ref": "BgpAsn"},":",{"Fn::FindInMap": ["RouteDomains","ProductionMgmt","RDNum"]},"'}}}"]]}
+          "'Item': {'rd_name': {'S':'",{"Fn::FindInMap": ["RouteDomains","ProductionMgmt","Name"]},"'},'Peers':{'SS':['",{"Fn::FindInMap": ["RouteDomains","EdcCorp","Name"]},"','",{"Fn::FindInMap": ["RouteDomains","Production","Name"]},"']},'vrf_asn':{'S':'",{"Ref": "BgpAsn"},":",{"Fn::FindInMap": ["RouteDomains","ProductionMgmt","RDNum"]},"'}}}"]]}
+        }
+      },
+    "EdcCorpRouteDomain": {
+      "Type": "Custom::RouteDomain",
+      "Properties": {
+        "ServiceToken": {
+          "Fn::GetAtt": [
+            "SolutionHelper",
+            "Arn"
+          ]
+        },
+        "StoreInDDB": {
+          "Fn::Join" : [ "",[
+          "{'TableName': '",{"Ref": "RouteDomainList"},"',",
+          "'Item': {'rd_name': {'S':'",{"Fn::FindInMap": ["RouteDomains","EdcCorp","Name"]},"'},'Peers':{'SS':['",{"Fn::FindInMap": ["RouteDomains","Development","Name"]},"','",{"Fn::FindInMap": ["RouteDomains","DevelopmentMgmt","Name"]},"','",{"Fn::FindInMap": ["RouteDomains","ProductionMgmt","Name"]},"']},'vrf_asn':{'S':'",{"Ref": "BgpAsn"},":",{"Fn::FindInMap": ["RouteDomains","EdcCorp","RDNum"]},"'}}}"]]}
         }
       },
     "TransitVpcPollerRole": {
@@ -2332,6 +2385,13 @@
                 "ec2:DeleteVpnConnection"
               ],
               "Resource": "*"
+            },
+            {
+              "Effect": "Allow",
+            "Action":[
+              "lambda:InvokeFunction"
+            ],
+            "Resource": "*"
             },
             {
               "Effect": "Allow",
@@ -2478,7 +2538,7 @@
                 "Ref": "AWS::StackName"
               },
               "-VGW-Poller-1min', ",
-              "'ScheduleExpression' : 'cron(* * * * ? *)',",
+              "'ScheduleExpression' : 'cron(0/15 * * * ? *)',",
               "'Description': 'Transit VPC: Rule to trigger VGW-Poller every minute to find VGWs that need to be attached to the transit VPC.' }"
             ]
           ]
@@ -2631,8 +2691,7 @@
         }
       }
     },
-     "PeeringFunct": {
-      "DependsOn": "CiscoConfigFunct",
+    "PeeringFunct": {
       "Type": "Custom::LoadLambda",
       "Properties": {
         "ServiceToken": {
@@ -2697,8 +2756,8 @@
               {
                 "Ref": "AWS::StackName"
               },
-              "-VGW-Peering-1hr', ",
-              "'ScheduleExpression' : 'cron(0 0 0/1 1/1 * ? *)',",
+              "-Peering-Mngr-1hr', ",
+              "'ScheduleExpression' : 'cron(0 * * * ? *)',",
               "'Description': 'Transit VPC: Rule to trigger Peering Manager.' }"
             ]
           ]
@@ -2793,7 +2852,7 @@
         "Path": "/"
       }
     },
-    "TransitVpcPollerRolePolicy": {
+    "TransitVpcPeeringRolePolicy": {
       "Type": "AWS::IAM::Policy",
       "Properties": {
         "Roles": [
@@ -2952,7 +3011,7 @@
                 "Ref": "AWS::StackName"
               },
               "-AccountUpdate-1min', ",
-              "'ScheduleExpression' : 'cron(* * * * ? *)',",
+              "'ScheduleExpression' : 'cron(0 0 * * ? *)',",
               "'Description': 'Transit VPC: Rule to trigger AccountUpdate every minute to find VGWs that need to be attached to the transit VPC.' }"
             ]
           ]
@@ -3169,9 +3228,15 @@
           },
           {
             "IpProtocol": "tcp",
-            "FromPort": "0",
+            "FromPort": "22",
             "ToPort": "22",
-            "CidrIp": "0.0.0.0/0"
+            "CidrIp": "24.180.230.39/32"
+          },
+          {
+            "IpProtocol": "-1",
+            "FromPort" : "0",
+            "ToPort": "65535",
+            "CidrIp": "204.124.81.200/32"
           }
         ],
         "SecurityGroupEgress": [

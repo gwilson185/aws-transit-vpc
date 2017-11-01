@@ -5,7 +5,7 @@ import logging
 from botocore.exceptions import ClientError
 
 log = logging.getLogger()
-log.setLevel(logging.DEBUG)
+log.setLevel(logging.INFO)
 
 
 rolename = '%ROLE_NAME%'
